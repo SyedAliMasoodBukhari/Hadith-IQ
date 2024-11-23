@@ -1,5 +1,9 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -42,27 +46,7 @@ class MyApp extends StatelessWidget {
                         ),
                       ),
                       onPressed: () async {
-                        FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-                        if (result != null) {
-                          // File picked successfully
-                          print("File picked: ${result.files.single.name}");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("File picked: ${result.files.single.name}"),
-                              duration: const Duration(seconds: 3),
-                            ),
-                          );
-                        } else {
-                          // User canceled the picker
-                          print("File picker canceled");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("File picker canceled"),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        }
+                        await pickAndUploadFile(context);
                       },
                       icon: const Icon(Icons.add),
                       label: const Text('Import'),
@@ -149,6 +133,55 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> pickAndUploadFile(BuildContext context) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      String? filePath = result.files.single.path;
+
+      if (filePath != null) {
+        File file = File(filePath);
+        try {
+          // Show a loading dialog while uploading
+          // Create multipart request
+          var request = http.MultipartRequest(
+            "POST",
+            Uri.parse("http://127.0.0.1:8000/importfile"),
+          );
+
+          // Add the file to the request
+          request.files.add(await http.MultipartFile.fromPath('file', file.path));
+
+          // Send the request
+          var response = await request.send();
+
+          // Close the loading dialog
+          //Navigator.of(context).pop();
+
+          // Handle response
+          if (response.statusCode == 200) {
+            /*ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("File uploaded successfully!")),
+            );*/
+          } else {
+            /*ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Failed to upload file. Status code: ${response.statusCode}")),
+            )*/
+          }
+        } catch (e) {
+          //Navigator.of(context).pop(); // Close the loading dialog
+          /*ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: $e")),
+          )*/
+        }
+      }
+    } else {
+      /*ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("File picker canceled")),
+      );*/
+    }
   }
 }
 
