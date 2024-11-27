@@ -1,4 +1,4 @@
-from AbsSanadBO import AbsSanadBO
+from BusinessLogicLayer.Sanad.AbsSanadBO import AbsSanadBO
 from typing import List
 from TO.SanadTO import SanadTO
 from TO.NarratorTO import NarratorTO

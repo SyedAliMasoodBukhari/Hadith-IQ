@@ -1,38 +1,36 @@
-from AbsHadithBO import AbsHadithBO
+from abc import ABC,abstractmethod
 from typing import List,Dict
 from TO.HadithTO import HadithTO
-class HadithBO(AbsHadithBO):
-    
+class AbsHadithBO(ABC):
+
+    @abstractmethod
     def importedHadithFile(self,filePath:str)->bool:
-        return None
+        pass
     
-    
+    @abstractmethod
     def getAllHadith(self)->List[HadithTO]:
-        return None
+        pass
     
-    
+    @abstractmethod
     def semanticSearch(self,hadith:str)->List[HadithTO]:
-        return None
+        pass
 
-    
+    @abstractmethod
     def getHadithData(self,HadithTO:HadithTO)->Dict:
-        return None
+        pass
 
-    
+    @abstractmethod
     def sortHadith(self,ByNarrator:bool,ByGrade:bool,GradeType:List[str])->List[HadithTO]:
-        return None
+        pass
 
-    
+    @abstractmethod
     def generateHadithFile(self,path:str,HadithTO:List[HadithTO])->bool:
-        return None
+        pass
     
-    
+    @abstractmethod
     def expandSearch(self,HadithTO:List[HadithTO])->List[HadithTO]:
-        return None
-    
-    def createAndStoreEmbeddings(self,hadithTOList:List[HadithTO])->bool:
-        return None
-    
-    #def createSingleEmbedding(self,hadith:str)->
-    def authenticateHadith(self,hadithTO:HadithTO)->bool:
-         return None
+        pass
+
+    @abstractmethod
+    def insertHadith(self,HadithTO:List[HadithTO])->bool:
+        pass

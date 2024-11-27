@@ -1,4 +1,4 @@
-from AbsSanadDAO import AbsSanadDAO
+from DataAccessLayer.Sanad.AbsSanadDAO import AbsSanadDAO
 from TO.HadithTO import HadithTO
 from TO.NarratorTO import NarratorTO
 from typing import List

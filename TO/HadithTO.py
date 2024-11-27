@@ -1,10 +1,11 @@
-from typing import List
 class HadithTO:
-    def __init__(self,hadithID:int,matn:str,matnEmbedding: list,hadithAuthenticity: str):
+    def __init__(self,hadithID:int,matn:str,matnEmbedding: str,hadithAuthenticity: str,bookName :str,cleanedMatn :str):
         self.__hadithId = hadithID
         self.__matn = matn
         self.__matnEmbedding = matnEmbedding
         self.__hadithAuthenticity = hadithAuthenticity
+        self.__bookName=bookName
+        self.__cleanedMatn=cleanedMatn
     
     @property
     def hadithId(self)->int:
@@ -21,16 +22,29 @@ class HadithTO:
         self.__matn = value
 
     @property
-    def matnEmbedding(self)->list:
-        return self.matnEmbeddings
+    def matnEmbedding(self)->str:
+        return self.__matnEmbedding
     @matnEmbedding.setter
-    def matnEmbedding(self,value:list):
+    def matnEmbedding(self,value:str):
         self.__matnEmbedding = value
     
     @property
     def hadithAuthenticity(self)->str:
-        return self.__hadithAuthencitiy
+        return self.__hadithAuthenticity
     @hadithAuthenticity.setter
     def hadithAuthenticity(self,value:str):
         self.__hadithAuthenticity=value
+
+    @property
+    def bookName(self)->str:
+        return self.__bookName
+    @bookName.setter
+    def bookName(self,value:str):
+        self.__bookName=value
     
+    @property
+    def cleanedMatn(self)->str:
+        return self.__cleanedMatn
+    @cleanedMatn.setter
+    def cleanedMatn(self,value:str):
+        self.__cleanedMatn=value

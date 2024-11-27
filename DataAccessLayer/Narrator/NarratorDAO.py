@@ -1,29 +1,27 @@
-from abc import ABC,abstractmethod
+from DataAccessLayer.Narrator.AbsNarratorDAO import AbsNarratorDAO
+from typing import List,Dict
 from TO.NarratorTO import NarratorTO
 from TO.HadithTO import HadithTO
-from typing import List,Dict
-class AbsNarratorDAO(ABC):
-    
-    @abstractmethod
+class NarratorDAO(AbsNarratorDAO):
+  
     def insertNarrator(self,narratorTO : NarratorTO)->bool:
-        pass
+        return None
     
-    @abstractmethod 
+    
     def getAllNarrators(self)->List[NarratorTO]:
-        pass
+        return None
     
-    @abstractmethod
+    
     def getsSimilarNarrator(self,NarratorTO:NarratorTO)->List[NarratorTO]:
-        pass
+        return None
     
-    @abstractmethod
+    
     def importNarratorOpinion(self,File:str)->bool:
-        pass
+        return None
     
-    @abstractmethod
+    
     def getNarratedHadith(self,NarratorTO:NarratorTO)->List[HadithTO]:
-     pass
+     return None
 
-    @abstractmethod
     def getNarratorDetails(self,NarratorTO:NarratorTO)->Dict:
-        pass
+        return None
