@@ -12,7 +12,7 @@ class AbsHadithBO(ABC):
         pass
     
     @abstractmethod
-    def semanticSearch(self,hadith:str)->List[HadithTO]:
+    def semanticSearch(self, hadith: str,projectName:str) -> dict:
         pass
 
     @abstractmethod
@@ -28,7 +28,7 @@ class AbsHadithBO(ABC):
         pass
     
     @abstractmethod
-    def expandSearch(self,HadithTO:List[HadithTO])->List[HadithTO]:
+    def expandSearch(self,HadithTO:List[str],projectName: str)->dict:
         pass
 
     @abstractmethod

@@ -9,7 +9,7 @@ class HadithDAO(AbsHadithDAO):
 
    def __init__(self, db_connection: DbConnection,util :UtilDao):
         self.__db_connection = db_connection
-        util=util
+        self.__util=util
 
    def insertHadith(self, hadithTO: HadithTO) -> bool:
     """Inserts a Hadith record into the database."""
@@ -43,12 +43,12 @@ class HadithDAO(AbsHadithDAO):
     :return: A dictionary where keys are Hadith matn and values are embeddings.
     """
     try:
-        project_id = self.util.getProjectId(projectName)
+        project_id = self.__util.getProjectId(projectName)
         if project_id == -1:
             raise ValueError(f"Project with name '{projectName}' not found.")
         connection = self.__db_connection.getConnection()
         cursor = connection.cursor()
-        query = "SELECT HadithID FROM hadithproject WHERE ProjectID = %s"
+        query = "SELECT HadithID FROM hadith_project WHERE ProjectID = %s"
         cursor.execute(query, (project_id,))
         hadith_ids = cursor.fetchall() 
 

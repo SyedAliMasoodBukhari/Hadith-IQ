@@ -1,26 +1,34 @@
 class ProjectTO:
-    def __init__(self,projectId:int,projectName:str,creationTimeStamp:str):
-        self.__projectId = projectId
-        self.__projectName = projectName
-        self.__creationTimeStamp = creationTimeStamp
+    def __init__(self,projectID:int,name:str,lastUpdated: str,createdAt: str):
+        self.__projectID = projectID
+        self.__name = name
+        self.__lastUpdated = lastUpdated
+        self.__createdAt = createdAt
     
     @property
-    def projectId(self)->int:
-        return self.__projectId
-    @projectId.setter
-    def projectId(self,value:int):
-        self.__projectId = value
+    def projectID(self)->int:
+        return self.__projectID
+    @projectID.setter
+    def projectID(self,value:int):
+        self.__projectID=value
     
     @property
-    def projectName(self)->str:
-        return self.__projectName
-    @projectName.setter
-    def projectName(self,value:str):
-        self.__projectName = value
+    def name(self)->str:
+        return self.__name
+    @name.setter
+    def name(self,value:str):
+        self.__name = value
+
+    @property
+    def lastUpdated(self)->str:
+        return self.__lastUpdated
+    @lastUpdated.setter
+    def lastUpdated(self,value:str):
+        self.__lastUpdated = value
     
     @property
-    def creationTimeStamp(self)->str:
-        return self.creationTimeStamp
-    @creationTimeStamp.setter
-    def creationTimeStamp(self,value:str):
-        self.creationTimeStamp = value
+    def createdAt(self)->str:
+        return self.__createdAt
+    @createdAt.setter
+    def createdAt(self,value:str):
+        self.__createdAt=value

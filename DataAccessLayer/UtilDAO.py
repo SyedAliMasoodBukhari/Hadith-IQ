@@ -1,6 +1,4 @@
 
-from DataAccessLayer.DbConnection import DbConnection
-
 class UtilDao:
     def __init__(self, db_connection):
         """

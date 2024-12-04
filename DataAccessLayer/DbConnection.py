@@ -34,7 +34,7 @@ class DbConnection:
         if 'database' in config:
             self.__DB_URL = config['database'].get('DB_URL')
             self.__DB_USER = config['database'].get('DB_USER')
-            self.__DB_PASSWORD =""
+            self.__DB_PASSWORD =config['database'].get('DB_PASSWORD')
             self.__DATABASE = config['database'].get('DATABASE')
            
 

@@ -6,8 +6,10 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        "mysql-connector-python"  # Add other dependencies here
-        "pip install sentence-transformers"
-        "numpy"
+        "mysql-connector-python",
+        "sentence-transformers",
+        "numpy",
+        "fastapi",
+        "uvicorn",
     ],
 )

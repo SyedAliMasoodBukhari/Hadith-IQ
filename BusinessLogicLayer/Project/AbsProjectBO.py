@@ -1,5 +1,4 @@
 from abc import ABC,abstractmethod
-from TO.ProjectTO import ProjectTO
 from typing import List
 class AbsProjectBO(ABC):
  
@@ -20,5 +19,5 @@ class AbsProjectBO(ABC):
   pass
  
  @abstractmethod
- def getProjects(self)->List[ProjectTO]:
+ def getProjects(self)->List[str]:
   pass

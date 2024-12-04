@@ -2,10 +2,8 @@ from BusinessLogicLayer.Project.AbsProjectBO import AbsProjectBO
 from BusinessLogicLayer.Hadith.AbsHadithBO import AbsHadithBO
 from BusinessLogicLayer.Narrator.AbsNarratorBO import AbsNarratorBO
 from BusinessLogicLayer.Sanad.AbsSanadBO import AbsSanadBO
-from BusinessLogicLayer.Opinion.AbsOpinionBO import AbsOpinionBO
 from TO.SanadTO import SanadTO
 from TO.HadithTO import HadithTO
-from TO.OpinionTO import OpinionTO
 from TO.ProjectTO import ProjectTO
 from TO.NarratorTO import NarratorTO
 from typing import List,Dict
@@ -45,7 +43,7 @@ class AbsBLLFascade(ABC):
         pass
     
      @abstractmethod
-     def semanticSearch(self,hadith:str)->List[HadithTO]:
+     def semanticSearch(self, hadith: str,projectName:str) -> dict:
         pass
 
      @abstractmethod
@@ -61,8 +59,8 @@ class AbsBLLFascade(ABC):
         pass
     
      @abstractmethod
-     def expandSearch(self,HadithTO:List[HadithTO])->List[HadithTO]:
-        pass
+     def expandSearch(self,HadithTO:List[str],projectName: str)->dict:
+       pass
      
      #AbsNarratorBO funtions
      @abstractmethod
@@ -115,7 +113,7 @@ class AbsBLLFascade(ABC):
         pass
      
      #AbsOpinionBo Functions
-     @abstractmethod
-     def getOpinions(self,narratorTO:NarratorTO)->List[OpinionTO]:
-        pass
+   #   @abstractmethod
+   #   def getOpinions(self,narratorTO:NarratorTO)->List[OpinionTO]:
+   #      pass
     
