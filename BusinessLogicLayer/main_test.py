@@ -32,16 +32,14 @@ def main():
     sanadBO = SanadBO(dalFascade)
     bllFascade = BLLFascade(hadithBO, sanadBO, projectBO, narratorBO)
     start = time.time()
-    result = bllFascade.importHadithFile("test",r"D:\Updated_FYP\صحيح البخاري.csv")
+    #result = bllFascade.importHadithFile("test",r"D:\Updated_FYP\صحيح البخاري.csv")
+    hadith = ['{matn: احيي اتي مثل صلصل جرس هو اشد علي فصم عن وقد وعي ما قال احيي تمثل لي ملك رجل كلم عيي ما قال, similarity: 0.9385322988830216}']
+    #result = bllFascade.semanticSearch("احيي اتي مثل صلصل جرس هو اشد علي فصم عن وقد وعي ما قال احيي تمثل لي ملك رجل كلم عيي ما قال","test",20)
+    result = bllFascade.expandSearch(hadith,"test",0.30)
     end = time.time()
-    print(end-start)    
-    try:
-      if result:
-        print("File Imported Successfully")
-      else:
-        print("File not Imported")
-    except Exception as e:
-       print("Import Error {e}")
+    print(end-start)
+    print('\n')
+    print(result)    
 
 def testing():
    try:

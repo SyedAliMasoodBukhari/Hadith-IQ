@@ -1,4 +1,6 @@
+from multiprocessing.shared_memory import SharedMemory
 import ast
+import logging
 from BusinessLogicLayer.Hadith.AbsHadithBO import AbsHadithBO
 from DataAccessLayer.Fascade.AbsDALFascade import AbsDALFascade
 from typing import List, Dict
@@ -20,8 +22,8 @@ from functools import partial
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from multiprocessing import Manager
 import math
+import pickle
 import time
-
 
 
 class HadithBO(AbsHadithBO):    
@@ -125,16 +127,6 @@ class HadithBO(AbsHadithBO):
         return processed_chunk
       # Flatten the processed results from all threads
       #self.logger.info("Merging Results from Each Thread")
-
-    
-    """
-    # Private Funtions ---------------------------------------------------
-    def process_chunk(self,chunk):
-        # Use ThreadPoolExecutor for multithreading
-        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
-            processed_chunk = list(executor.map(self.process_entry, chunk))
-        return processed_chunk
-    """
     
     
     # Function to divide data among processes
@@ -144,183 +136,164 @@ class HadithBO(AbsHadithBO):
 
         with Pool(processes=num_processes) as pool:
             results = pool.map(process_chunk, chunks)
-
+        
         processed_data = [entry for chunk in results for entry in chunk]
         return processed_data
-    # ---------------------------------Multi processing wala-----------------------------------------
-
-    # def importHadithFile(self, projectName: str, filePath: str) -> bool:
-    #     start_time = time.time()  # Track start time
-        
-    #     bookData = self.dalFascade.importBook(projectName, filePath)
-
-    #     finalResult = False
-
-    #     if not bookData:
-    #         # if no data is returned
-    #         print("No book data found.")
-    #         return False
-
-    #     # Prepare data for parallel processing
-    #     hadith_data = [(hadith, projectName) for hadith in bookData]
-
-    #     # Use multiprocessing to process Hadiths in parallel
-    #     with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-    #         results = pool.map(self._process_hadith, hadith_data)
-
-    #     # Track time after multiprocessing
-    #     processing_time = time.time() - start_time
-    #     print(f"Time taken for multiprocessing: {processing_time:.2f} seconds")
-
-    #     # Process results (db insertion done sequentially)
-    #     for result in results:
-    #         if result:
-    #             finalResult = True
-
-    #     total_time = time.time() - start_time  # Total time including data fetching
-    #     print(f"Total time for importing Hadith file: {total_time:.2f} seconds")
-
-    #     return finalResult
-
-
-    # # Helper function for parallel processing of each Hadith
-    # def _process_hadith(self, hadith_data):
-    #     hadith, projectName = hadith_data
-
-    #     _matn = hadith.get("matn")
-    #     _matnClean = self._getActualMatn(_matn)
-    #     _matn = self._clean_text(_matn)
-    #     _bookName = hadith.get("bookname")
-    #     _sanad = hadith.get("sanad")
-        
-    #     # Parallelize the complex text processing (cleaning, lemmatization, etc.)
-    #     _cleanedMatn = self._process_text_preprocessing(_matnClean)
-
-    #     # Generate embeddings
-    #     _matnEmbedding = self._generateEmbeddings(_cleanedMatn)
-
-    #     return {
-    #         "matn": _matn,
-    #         "bookName": _bookName,
-    #         "sanad": _sanad,
-    #         "cleanedMatn": _cleanedMatn,
-    #         "matnEmbedding": _matnEmbedding
-    #     }
-
-
-    # # Helper function to handle text preprocessing in parallel
-    # def _process_text_preprocessing(self, matnClean):
-    #     _cleanedMatn = self._cleanHadithMatn(self._lemmatize_arabic_sentence(self._cleanHadithMatn(matnClean)))
-    #     return _cleanedMatn
-
-
-    # def sequential_db_insertion(self, results, projectName):
-    #     finalResult = False
-
-    #     for result in results:
-    #         _matn = result.get("matn")
-    #         _bookName = result.get("bookName")
-    #         _sanad = result.get("sanad")
-    #         _cleanedMatn = result.get("cleanedMatn")
-    #         _matnEmbedding = result.get("matnEmbedding")
-
-    #         if _matn and _bookName and _sanad:
-    #             # Insert Book record (if applicable)
-    #             if self.__dalFascade.insertBook(projectName, _bookName):
-    #                 _hadithTO = HadithTO(
-    #                     0, _matn, _matnEmbedding, "Authentic", _bookName, _cleanedMatn
-    #                 )
-    #                 _hadithResult = self.__dalFascade.insertHadith(
-    #                     projectName, _hadithTO
-    #                 )
-    #                 if _hadithResult:
-    #                     if _sanad != "No SANAD":
-    #                         sanadTO = SanadTO(_sanad, "Authentic", _hadithTO)
-    #                         _resultSanad = self.__dalFascade.insertSanad(
-    #                             projectName, sanadTO
-    #                         )
-
-    #                     if _resultSanad:
-    #                         _listNarrators = self._transformSanad(_sanad)
-    #                         if _listNarrators:
-    #                             finalResult = self._insertHadithNarrators(
-    #                                 _sanad, _listNarrators
-    #                             )
-    #     return finalResult
-
     
-    # --------------------------------------------------------------------------
-
     def getAllHadith(self) -> List[HadithTO]:
         return None
     
-    # ---------------------------------Multi processing wala-----------------------------------------
-
-    # def semanticSearch(self, hadith: str, projectName: str, threshold: float) -> dict:
-    #     try:
-    #         # Step 1: Preprocess and generate embedding for query in parallel
-    #         _queryEmbedding = self._process_preprocessing_and_embedding(hadith)
-
-    #         # Get Hadith dictionary
-    #         _hadithDict = self.dalFascade.getProjectHadithsEmbedding(projectName)
-            
-    #         if not _hadithDict:
-    #             return []
-
-    #         # Step 2: Process Hadith dictionary in batches and calculate cosine similarity
-    #         _batch_size = 100
-    #         _batched_results = []
-    #         _hadith_batches = self._createBatches(_hadithDict, _batch_size)
-
-    #         # Apply multiprocessing to cosine similarity computation
-    #         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-    #             # Map the _process_batch function to each batch
-    #             _batched_results = pool.map(self._process_batch, [(batch, _queryEmbedding) for batch in _hadith_batches])
-
-    #         # Flatten the list of results
-    #         _batched_results = [item for sublist in _batched_results for item in sublist]
-
-    #         # Step 3: Filter and sort results based on threshold
-    #         _filtered_results = [
-    #             {"matn": result["matn"], "similarity": result["similarity"]}
-    #             for result in _batched_results
-    #             if result["similarity"] >= threshold
-    #         ]
-            
-    #         _filtered_results.sort(key=lambda x: x["similarity"], reverse=True)
-    #         return _filtered_results
-
-    #     except Exception as e:
-    #         print(f"Error in semanticSearch: {e}")
-    #         return []
-
-
-    # # Helper function for preprocessing and embedding generation in parallel
-    # def _process_preprocessing_and_embedding(self, hadith):
-    #     _query = self._getActualMatn(hadith)
-    #     _query = self._cleanHadithMatn(self._lemmatize_arabic_sentence(self._cleanHadithMatn(_query)))
-    #     _queryEmbedding = self._generateEmbeddings(_query)
-    #     return _queryEmbedding
-
-    # # Helper function for cosine similarity calculation in parallel
-    # def _process_batch(self, batch_and_embedding):
-    #     batch, queryEmbedding = batch_and_embedding
-    #     # Process the batch and calculate cosine similarity
-    #     return self._cosineSimilarity(queryEmbedding, batch)
-
-        # --------------------------------------------------------------------------
-
     def semanticSearch(self, hadith: str, projectName: str, threshold: float) -> dict:
         _query = self._getActualMatn(hadith)
-        _query=self._cleanHadithMatn(self._lemmatize_arabic_sentence(self._cleanHadithMatn(_query)))
+        _query=self._cleanHadithMatn(self._lemmatize_arabic_sentence(self._cleanHadithMatn(_query),self.morphology_db))
         # _query = self._cleanHadithMatn(_query)
-        _queryEmbedding = self._generateEmbeddings(_query)
+        _queryEmbedding = self._generateEmbeddings(_query,self.labse_model)
+        #Returns Dictionary of Hadith Embedding 
         _hadithDict = self.dalFascade.getProjectHadithsEmbedding(projectName)
-
+        num_cores = cpu_count()
         # Processing the Hadith dictionary in batches
-        _batch_size = 100
-        _batched_results = []
-        _hadith_batches = self._createBatches(_hadithDict, _batch_size)
+        #_test = self._createBatchestest(_hadithDict)
+        #_hadith_batches = self._createBatches(_hadithDict, num_cores)
+
+        #makes _hadith_batches available to all the process via shared memory 
+        manager = Manager()
+        _hadith_batches = manager.list(self._createBatches(_hadithDict, num_cores))
+
+        cosine_similarity_fn = partial(self._cosineSimilarity, _queryEmbedding)
+        process_chunk_fn = partial(self.process_chunk_similarity, cosine_similarity_fn)
+        #process_batch_partial = partial(self.process_batch, process_chunk_fn, num_cores)
+        process_batch_partial = partial(self.process_batch,cosine_similarity_fn)
+        """
+        try:
+            with Pool(processes=num_cores) as pool:
+                results = pool.map(process_batch_partial, _hadith_batches)
+        except Exception as e:
+            print(f"Error during multiprocessing: {e}")
+            return []
+        """
+        #for batches in _hadith_batches:
+        print(f"\n Hadith Batches : {[range(len(_hadith_batches))]}")
+        try:
+           with Pool(processes=num_cores) as pool:
+            #results = pool.starmap(process_batch_partial,_hadith_batches)
+            #results = pool.map(process_batch_partial,range(len(_hadith_batches)))
+             results = pool.starmap(process_batch_partial, [(index, _hadith_batches) for index in range(len(_hadith_batches))])
+            #results = pool.map(lambda i: process_batch_partial(_hadith_batches[i]), range(len(_hadith_batches)))
+        except Exception as e:
+          print(f"Error during multiprocessing: {e}")
+          return []
+        all_results = [item for sublist in results for item in sublist]
+        all_results = [item for sublist in all_results for item in sublist]
+        all_results.sort(key=lambda x: x["similarity"], reverse=True)
+        _filtered_results = [
+        {"matn": result["matn"], "similarity": result["similarity"]}
+        for result in all_results
+        if result["similarity"] >= threshold
+         ]
+        return _filtered_results
+    
+
+    @staticmethod
+    def process_batch(cosine_similarity_fn, index, _hadith_batches): #accepting List[List[Dict]]
+        # Calculate chunk sizes more robustly
+        if not isinstance(index, int):  
+         raise ValueError(f"got index as int {index}")
+        batch_local =_hadith_batches[index]
+        print(f"Going towards threading : {index}")
+        print(f"Printing Batch : {batch_local}")
+        results = cosine_similarity_fn(batch_local)
+        results = [results]
+        # Collect results from each future
+        return results
+    
+    """
+    @staticmethod
+    def process_batch(process_chunk_fn, batch, num_cores): #accepting List[List[Dict]]
+        # Calculate chunk sizes more robustly
+        if not isinstance(batch, list):  
+         raise ValueError(f"Expected batch to be a list, got {type(batch)}")
+
+    # Handle case where batch items (chunks) might be dictionaries
+        #if isinstance(batch[0], dict):  
+         #batch = [batch]  # Wrap it into a list for uniform processing
+
+    # Calculate chunk size robustly
+        #chunk_size = max(1, len(batch) // num_cores)
+        #chunks = [batch[i: i + chunk_size] for i in range(0, len(batch), chunk_size)]
+        #chunk_size = max(1, len(batch) // num_cores)
+        #chunks = [batch[i: i + chunk_size] for i in range(0, len(batch), chunk_size)]
+        results = []
+        print(f"Going towards threading : {os.getpid}")
+        with ThreadPoolExecutor(max_workers=num_cores) as executor:
+        # Submit each chunk to the executor
+         print(f"within ThreadPool")
+         futures = [executor.submit(process_chunk_fn, chunk) for chunk in batch]
+        
+        # Collect results from each future
+         for future in futures:
+            # The result for each future is a List[Dict], so wrap the result into a List
+            result = future.result()
+            results.append(result)  # Append the List[Dict] to the results list
+        with ThreadPoolExecutor(max_workers=num_cores) as executor:
+            futures = [executor.submit(process_chunk_fn, chunk) for chunk in batch] #Passing List[Dict]
+            for future in futures:
+                results.extend(future.result())
+        return results
+    """
+    """
+    def process_batch(process_chunk_fn, batch, num_cores):
+    # This function divides the batch into smaller chunks and processes each chunk with threads.
+     results = []
+     chunk_size = len(batch) // num_cores  # Divide the batch into chunks for each thread
+    
+    # Ensure all chunks have roughly the same size
+     for i in range(num_cores):
+        start_idx = i * chunk_size
+        end_idx = start_idx + chunk_size if i != num_cores - 1 else len(batch)
+        
+        # Create a sublist (chunk) for this thread to process
+        chunk = batch[start_idx:end_idx]
+        
+        # Use ThreadPoolExecutor to process the chunk
+        with ThreadPoolExecutor(max_workers=num_cores) as executor:
+            futures = [executor.submit(process_chunk_fn,entry) for entry in chunk]
+            
+            # Gather results from threads
+            for future in futures:
+                results.extend(future.result())  # Flatten results from all threads
+    
+     return results
+    """
+    @staticmethod
+    def process_chunk_similarity(cosine_similarity_fn, chunk):
+        if not isinstance(chunk, list):
+         raise ValueError(f"Expected chunk to be a list, got {type(chunk)}")
+        if not all(isinstance(entry, dict) for entry in chunk):
+         raise ValueError("Each item in the chunk should be a dictionary.")
+    
+     # Process each dictionary (entry) in the chunk and collect results
+         # Convert List[Dict] to a single Dict (e.g., merge all dictionaries)
+        """
+        print(f"chunk:{chunk}")
+        merged_dict = {k: v for d in chunk for k, v in d.items()}
+        print(f"merged_dict : {merged_dict}")
+        """
+        results = cosine_similarity_fn(chunk)
+        print(f"resultantChunk:{results}")
+        results = [results]
+        return results
+    """
+    @staticmethod
+    def process_batch(cosine_similarity_fn,batch,num_cores):
+            results = []
+            with ThreadPoolExecutor(max_workers=num_cores) as executor:
+                futures = [executor.submit(cosine_similarity_fn, [entry]) for entry in batch]
+                for future in futures:
+                    results.extend(future.result())
+            return results
+    """
+            
+    """
         for batch in _hadith_batches:
             _batch_result = self._cosineSimilarity(_queryEmbedding, batch)
             _batched_results.extend(_batch_result)
@@ -332,6 +305,7 @@ class HadithBO(AbsHadithBO):
             if result["similarity"] >= _threshold
         ]
         return _filtered_results
+    """
 
     def getHadithData(self, HadithTO: HadithTO) -> Dict:
         return None
@@ -400,127 +374,94 @@ class HadithBO(AbsHadithBO):
     def generateHadithFile(self, path: str, HadithTO: List[HadithTO]) -> bool:
         return None
     
-    # ---------------------------------Multi processing wala-----------------------------------------
 
-    # def expandSearch(self, hadith_list: List[str], projectName: str, threshold: float) -> List[dict]:
-    #     try:
-    #         hadiths = []
+    def expandSearch(self, hadith_list: List[str], projectName: str, threshold: float) -> List[dict]:
+     try:
+        # Extract hadiths as dictionaries from hadith_list
+        hadiths = []
+        matn_pattern = r'matn:\s*(.*?),'
+        similarity_pattern = r'similarity:\s*(\d+\.\d+)'
+        for h in hadith_list:
+            hadith = {}
+            matn_match = re.search(matn_pattern, h)
+            similarity_match = re.search(similarity_pattern, h)
+            if matn_match:
+                hadith["matn"] = matn_match.group(1).strip()
+            if similarity_match:
+                hadith["similarity"] = float(similarity_match.group(1))
+            hadiths.append(hadith)
+        
+        num_cores = cpu_count()
+        # Function to process a chunk of hadiths
+        _hadithDict = self.dalFascade.getProjectHadithsEmbedding(projectName)
+        _hadith_batches = self._createBatches(_hadithDict,1)
+        #with Manager() as manager:
+            #shared_hadithDict = manager.dict(_hadithDict)  # Shared dictionary
+            #shared_hadith_batches = manager.list(_hadith_batches)  # Shared list
 
-    #         # Regular expressions to extract matn and similarity
-    #         matn_pattern = r"matn:\s*(.*?),"
-    #         similarity_pattern = r"similarity:\s*(\d+\.\d+)"
-    #         # Loop through each string in the list
-    #         for h in hadith_list:
-    #             hadith = {}
-    #             # Extracting matn and similarity
-    #             matn_match = re.search(matn_pattern, h)
-    #             similarity_match = re.search(similarity_pattern, h)
+        hadith_dict_bytes = pickle.dumps(_hadithDict)  # Serialize dictionary
+        hadith_batches_bytes = pickle.dumps(_hadith_batches)  # Serialize list
 
-    #             # Assign values to the hadith dictionary if found
-    #             if matn_match:
-    #                 hadith["matn"] = matn_match.group(1).strip()
+        hadith_dict_shm = SharedMemory(create=True, size=len(hadith_dict_bytes))
+        hadith_batches_shm = SharedMemory(create=True, size=len(hadith_batches_bytes))
 
-    #             if similarity_match:
-    #                 hadith["similarity"] = float(similarity_match.group(1))
+        hadith_dict_shm.buf[:len(hadith_dict_bytes)] = hadith_dict_bytes
+        hadith_batches_shm.buf[:len(hadith_batches_bytes)] = hadith_batches_bytes
+        
+        
+        
+        # Split hadiths into sublists for multiprocessing
+        hadith_chunks = self._distributeHadithListAmongProcesses(hadiths,num_cores)
 
-    #             # Append the dictionary to the list
-    #             hadiths.append(hadith)
+        hadithCleaning_Partials = partial(
+        HadithBO._gethadithCleaning,
+        HadithBO._cleanHadithMatn,
+        HadithBO._getActualMatn,
+        partial(HadithBO._generateEmbeddings,labse_model=self.labse_model),
+        partial(HadithBO._lemmatize_arabic_sentence,morphology_db=self.morphology_db)
+        )
+        processExpandSearchInMultiProcessing = partial(
+            HadithBO.process_ExpandSearch_chunk,
+            partial(HadithBO._cosineSimilarity),
+            hadithCleaning_Partials,
+            #shared_hadithDict,shared_hadith_batches,
+            hadith_dict_shm.name,  # Pass shared memory name instead of dict
+            hadith_batches_shm.name,  # Pass shared memory name instead of list
+            threshold
+        )
+        num_cores_handled = len(hadith_chunks)  # Use only non-empty chunks
+        # Use multiprocessing to process each chunk
+        with Pool(processes=num_cores_handled) as pool:
+            results = pool.map(processExpandSearchInMultiProcessing, hadith_chunks)
 
-    #         # Step 1: Preprocessing with multiprocessing
-    #         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-    #             # Map the _process_preprocessing function to each Hadith
-    #             preprocessed_hadiths = pool.map(self._process_preprocessing, hadiths)
+        # Combine results from all processes
+        _expanded_results = [item for sublist in results for item in sublist]
 
-    #         # Step 2: Embedding generation with multiprocessing
-    #         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-    #             # Map the _generate_embedding function to each preprocessed Hadith
-    #             embeddings = pool.map(
-    #                 self._generate_embedding_for_hadith, preprocessed_hadiths
-    #             )
+        # Remove duplicates by keeping the one with the highest similarity for each matn
+        seen_mats = {}
+        for result in _expanded_results:
+            matn = result['matn']
+            similarity = result['similarity']
+            if matn not in seen_mats or seen_mats[matn].get("similarity", 0) < similarity:
+             seen_mats[matn] = result
+            #if matn not in seen_mats or seen_mats[matn]['similarity'] < similarity:
+                #seen_mats[matn] = result
 
-    #         # Step 3: Cosine similarity calculation with multiprocessing
-    #         _hadithDict = self.dalFascade.getProjectHadithsEmbedding(projectName)
+        # Collect unique results
+        _expanded_results = list(seen_mats.values())
 
-    #         if not _hadithDict:
-    #             return []
+        _expanded_results.sort(key=lambda x: x.get("similarity", 0), reverse=True)
+        return _expanded_results
 
-    #         _batch_size = 100
-    #         _batched_results = []
-    #         _hadith_batches = self._createBatches(_hadithDict, _batch_size)
-
-    #         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-    #             # Map the _process_cosine_similarity function to each batch
-    #             _batched_results = pool.map(
-    #                 self._process_cosine_similarity,
-    #                 [(batch, embeddings) for batch in _hadith_batches],
-    #             )
-
-    #         # Flatten the list of results
-    #         _batched_results = [item for sublist in _batched_results for item in sublist]
-
-    #         # Step 4: Filtering and Sorting
-    #         _filtered_results = [
-    #             {"matn": result["matn"], "similarity": result["similarity"]}
-    #             for result in _batched_results
-    #             if result.get("similarity", 0) >= threshold
-    #         ]
-    #         _filtered_results.sort(key=lambda x: x["similarity"], reverse=True)
-    #         _top_results = _filtered_results
-
-    #         # Step 5: Removing duplicates by similarity for each unique matn
-    #         seen_mats = {}
-    #         for result in _top_results:
-    #             matn = result["matn"]
-    #             similarity = result["similarity"]
-
-    #             if matn not in seen_mats or seen_mats[matn]["similarity"] < similarity:
-    #                 seen_mats[matn] = result
-
-    #         # Collect unique results
-    #         _expanded_results = list(seen_mats.values())
-
-    #         _expanded_results.sort(key=lambda x: x.get("similarity", 0), reverse=True)
-    #         return _expanded_results
-
-    #     except Exception as e:
-    #         print(f"Error in expandSearch: {e}")
-    #         return []
-
-
-    # # Helper function for preprocessing in parallel
-    # def _process_preprocessing(self, hadith):
-    #     _matn = hadith.get("matn", "")
-    #     if not isinstance(_matn, str):
-    #         raise ValueError(
-    #             f"Invalid 'matn' value: expected string, got {type(_matn).__name__}"
-    #         )
-
-    #     _cleaned_hadith = self._cleanHadithMatn(
-    #         self._lemmatize_arabic_sentence(
-    #             self._cleanHadithMatn(self._getActualMatn(_matn))
-    #         )
-    #     )
-    #     return {"matn": _cleaned_hadith, "original": hadith}
-
-
-    # # Helper function for generating embeddings in parallel
-    # def _generate_embedding_for_hadith(self, preprocessed_hadith):
-    #     cleaned_hadith = preprocessed_hadith["matn"]
-    #     _queryEmbedding = self._generateEmbeddings(cleaned_hadith)
-    #     return {"embedding": _queryEmbedding, "original": preprocessed_hadith}
-
-
-    # # Helper function for cosine similarity calculation in parallel
-    # def _process_cosine_similarity(self, batch_and_embeddings):
-    #     batch, embeddings = batch_and_embeddings
-    #     return self._cosineSimilarity(embeddings, batch)
-    
-    # --------------------------------------------------------------------------
-
-    def expandSearch(self, hadith_list: List[str], projectName: str,threshold:float) -> List[dict]:
+     except Exception as e:
+        print(f"Error in expandSearch: {e}")
+        return []
+     
+    def expandSearchtest(self, hadith_list: List[str], projectName: str,threshold:float) -> List[dict]:
         try:
+            print(hadith_list)
+            num_cores = cpu_count()
             hadiths = []
-
             # Regular expressions to extract matn and similarity
             matn_pattern = r'matn:\s*(.*?),'
             similarity_pattern = r'similarity:\s*(\d+\.\d+)'
@@ -540,23 +481,25 @@ class HadithBO(AbsHadithBO):
 
                 # Append the dictionary to the list
                 hadiths.append(hadith)
-                print(hadiths)
+                #print(hadiths)
             _expanded_results = []
+
+            #Applying MultiProcessing and Multithreading to the below functionalities
             for hadith in hadiths:
                 _matn = hadith.get("matn", "")
                 if not isinstance(_matn, str):
                     raise ValueError(f"Invalid 'matn' value: expected string, got {type(_matn).__name__}")
 
-                _cleaned_hadith = self._cleanHadithMatn(self._lemmatize_arabic_sentence(self._cleanHadithMatn(self._getActualMatn(_matn))))
-                print(_cleaned_hadith)
-                _queryEmbedding = self._generateEmbeddings(_cleaned_hadith)
+                _cleaned_hadith = self._cleanHadithMatn(self._lemmatize_arabic_sentence(self._cleanHadithMatn(self._getActualMatn(_matn)),self.morphology_db))
+                #print(_cleaned_hadith)
+                _queryEmbedding = self._generateEmbeddings(_cleaned_hadith,self.labse_model)
                 _hadithDict = self.dalFascade.getProjectHadithsEmbedding(projectName)
 
                 if not _hadithDict:
                    return []
-                _batch_size = 100
+                
                 _batched_results = []
-                _hadith_batches = self._createBatches(_hadithDict, _batch_size)
+                _hadith_batches = self._createBatches(_hadithDict, num_cores)
 
                 for batch in _hadith_batches:
                     _batch_result = self._cosineSimilarity(_queryEmbedding, batch)
@@ -590,14 +533,212 @@ class HadithBO(AbsHadithBO):
         except Exception as e:
             print(f"Error in expandSearch: {e}")
             return []
+    
 
     # Private Funtions ---------------------------------------------------
+    def _distributeHadithListAmongProcesses(self,hadithList,num_cores)->List[List]:
+        num_chunks = min(num_cores, len(hadithList))  # Prevent creating empty lists
+        chunk_size = math.ceil(len(hadithList) / num_chunks)  # Distribute elements evenly
 
-    def _createBatches(self, data_dict: dict, batch_size: int) -> List[dict]:
+        hadith_chunks = [
+        hadithList[i * chunk_size : (i + 1) * chunk_size] for i in range(num_chunks)
+        ]
+        return hadith_chunks
+        
+    @staticmethod
+    def _gethadithCleaning(_cleanHadithMatn,_getActualMatn,_generateEmbeddings,_lemmatize_arabic_sentence,_matn)->dict:
+         #needed all the given functions partials
+                _cleaned_hadith = _cleanHadithMatn(
+                    _lemmatize_arabic_sentence(
+                        _cleanHadithMatn(_getActualMatn(_matn)),
+                    )
+                )
+                #needed _generateEmbeddings Partials
+                _queryEmbedding = _generateEmbeddings(_cleaned_hadith)
+                return {"matn": _cleaned_hadith, "queryEmbedding": _queryEmbedding}
+
+    @staticmethod
+    def process_ExpandSearch_chunk(_cosineSimilarity,_gethadithCleaning,_hadithDictname,_hadith_batchesname,threshold,chunk):
+        try:
+            _expanded_results = []
+             # Open shared memory
+            hadith_dict_shm = SharedMemory(name=_hadithDictname)
+            hadith_batches_shm = SharedMemory(name=_hadith_batchesname)
+
+    # Deserialize data
+            _hadithDict = pickle.loads(hadith_dict_shm.buf)
+            _hadith_batches = pickle.loads(hadith_batches_shm.buf)
+            #print(f"\n hadithBatch : {_hadith_batches}")
+            for hadith in chunk:
+                _matn = hadith.get("matn", "")
+                if not isinstance(_matn, str):
+                    raise ValueError(f"Invalid 'matn' value: expected string, got {type(_matn).__name__}")
+                
+                #Needed to call this function
+                cleaned_hadith_dict =_gethadithCleaning(hadith.get("matn", ""))
+                _queryEmbedding = cleaned_hadith_dict.get("queryEmbedding")
+                _matn=cleaned_hadith_dict.get("matn")
+                #print(f"Value of Cleaned_hadith_dict : {_matn} {_queryEmbedding}")
+                #still needed to extract value from cleaned_hadith_dict into 2 variables {matn:queryEmbeddings}
+
+                #needed _hadithDict
+                if not _hadithDict:
+                    continue
+
+                _batched_results = []
+
+                #_hadithBatches and partial of cosineSimilarity
+                for batch in _hadith_batches:
+                    _batch_result = _cosineSimilarity(_queryEmbedding, batch)
+                    _batched_results.extend(_batch_result)
+                
+                #needed Threshold
+                _filtered_results = [
+                    {"matn": result["matn"], "similarity": result["similarity"]}
+                    for result in _batched_results if result.get("similarity", 0) >= threshold
+                ]
+                _filtered_results.sort(key=lambda x: x["similarity"], reverse=True)
+                _expanded_results.extend(_filtered_results)
+            print(f"\n Subprocess makes this result in expanded search : {_expanded_results}")
+            return _expanded_results
+        except Exception as e:
+            print(f"Error during processing chunk in MultiProcessing : {e} ")
+    
+
+    @staticmethod
+    def _createBatchestest(data_dict: dict, batch_size: int) -> List[List[dict]]:
+     items = list(data_dict.items())
+    
+    # Step 1: Convert dictionary items into List[Dict]
+     dict_list = [dict([item]) for item in items]  # Each key-value pair as a separate dict
+    
+    # Step 2: Split dict_list into List[List[Dict]] based on batch_size
+     result = [dict_list[i: i + batch_size] for i in range(0, len(dict_list), batch_size)]
+    
+     return result
+
+    @staticmethod
+    def _createBatches(data_dict: dict, num_batches: int) -> List[List[dict]]:
+     items = list(data_dict.items())
+     total_items = len(items)
+    
+     if num_batches <= 0:
+        raise ValueError("num_batches must be greater than zero.")
+    
+     batch_size = total_items // num_batches
+     remainder = total_items % num_batches
+
+     batches = []
+     start_index = 0
+     """
+     for i in range(num_batches):
+        # Calculate the end index for the batch
+        end_index = start_index + batch_size + (1 if i < remainder else 0)
+        sublist = dict(items[start_index:end_index])  # List of dicts
+        
+        # Now divide the sublist into num_cores parts
+        sublist_items = list(sublist.items())  # Convert the sublist into a list of items
+        chunk_size = len(sublist_items) // num_batches
+        remainder = len(sublist_items) % num_batches
+        
+        sub_batches = []
+        sub_start = 0
+        
+        for j in range(num_batches):
+            # Calculate the end index for each chunk (adding 1 if there's a remainder)
+            sub_end = sub_start + chunk_size + (1 if j < remainder else 0)
+            sub_chunk = dict(sublist_items[sub_start:sub_end])  # List of dicts in each chunk
+            sub_batches.append(sub_chunk)
+            sub_start = sub_end
+        
+        batches.append(sub_batches)  # Add the sub_batches to the final batches
+        start_index = end_index  # Update the start_index for the next batch
+     """
+     
+     for i in range(num_batches):
+        end_index = start_index + batch_size + (1 if i < remainder else 0)
+        sublist = dict(items[start_index:end_index])  # List of dicts
+        batches.append(sublist)
+        start_index = end_index
+    
+
+     print(f"Created {len(batches)} batches: {batches}")
+     return batches
+
+    """
+    def _createBatches(self, data_dict: dict, num_batches: int) -> List[List[dict]]:
+     items = list(data_dict.items())
+     total_items = len(items)
+    
+     if num_batches <= 0:  # Prevent division by zero
+        raise ValueError("num_batches must be greater than zero.")
+    
+     batch_size = total_items // num_batches
+     remainder = total_items % num_batches
+
+     batches = []
+     start_index = 0
+
+     for i in range(num_batches):
+        # Calculate the end index, accounting for remainder distribution
+        end_index = start_index + batch_size + (1 if i < remainder else 0)
+
+        # Instead of creating one-item dictionaries, just append a list of dicts
+        sublist = [dict(items[start_index:end_index])]  # Convert key-value pairs into a dict
+        
+        batches.append(sublist)
+        start_index = end_index
+
+     return batches
+    """
+    """
+    def _createBatches(self, data_dict: dict, num_batches: int) -> List[dict]:
+    
+     items = list(data_dict.items())
+     total_items = len(items)
+     batch_size = total_items // num_batches
+     remainder = total_items % num_batches
+
+     batches = []
+     start_index = 0
+
+     for i in range(num_batches):
+        # Calculate the end index, accounting for the remainder
+        end_index = start_index + batch_size + (1 if i < remainder else 0)
+        batches.append(dict(items[start_index:end_index]))
+        start_index = end_index
+
+     return batches
+    """
+    """
+    def _createBatchestest(self,data_dict: dict,batch_size:int) -> List[dict]:
         items = list(data_dict.items())
-        return [
+        result = [
             dict(items[i : i + batch_size]) for i in range(0, len(items), batch_size)
         ]
+        return result
+    """
+    
+    """
+    def _createBatches(self, data_dict: dict, num_batches: int) -> List[List[dict]]:
+    
+     items = list(data_dict.items())
+     total_items = len(items)
+     batch_size = total_items // num_batches
+     remainder = total_items % num_batches
+
+     batches = []
+     start_index = 0
+
+     for i in range(num_batches):
+        # Calculate the end index, accounting for the remainder
+        end_index = start_index + batch_size + (1 if i < remainder else 0)
+        sublist = [dict([item]) for item in items[start_index:end_index]]
+        batches.append(sublist)
+        start_index = end_index
+
+     return batches
+    """
     
     @staticmethod
     def _cleanHadithMatn(matn: str) -> str:
@@ -627,8 +768,10 @@ class HadithBO(AbsHadithBO):
             cleaned_text = re.sub(phrase, "", cleaned_text).strip()
 
         return cleaned_text
-
-    def _cosineSimilarity(self, queryEmbedding: str, hadith_embeddings: dict) -> dict:
+    
+    
+    @staticmethod
+    def _cosineSimilarity(queryEmbedding: str, hadith_embeddings: dict) -> dict:
         try:
             queryEmbedding = np.array(ast.literal_eval(queryEmbedding)).reshape(
                 1, -1
@@ -647,6 +790,7 @@ class HadithBO(AbsHadithBO):
         except Exception as e:
             print(f"Error calculating cosine similarity: {e}")
             return []
+    
     
     @staticmethod
     def _lemmatize_arabic_sentence(sentence: str, morphology_db: MorphologyDB) -> str:
