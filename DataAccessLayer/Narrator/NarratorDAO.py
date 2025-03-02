@@ -17,27 +17,25 @@ class NarratorDAO(AbsNarratorDAO):
         try:
             session: Session = self.__dbConnection.getSession()
 
-            sanadObj = session.query(Sanad).filter(Sanad.Sanad == sanad).first()
+            sanadObj = session.query(Sanad).filter(Sanad.sanad == sanad).first()
             if not sanadObj:
                 print(f"Sanad '{sanad}' not found.")
                 return False
             
-            _sanadID = sanadObj.SanadID
+            _sanadID = sanadObj.sanadid
 
             # Check if the narrator already exists
-            narratorObj = session.query(Narrator).filter(Narrator.NarratorName == narratorTO.narratorName).first()
+            narratorObj = session.query(Narrator).filter(Narrator.narratorname == narratorTO.narratorName).first()
             if not narratorObj:
                 narratorObj = Narrator(
-                    NarratorName=narratorTO.narratorName,
-                    NarratorAuthenticity="Authentic"  # Default authenticity
+                    narratorname=narratorTO.narratorName,
+                    narratorauthenticity="Authentic"  
                 )
                 session.add(narratorObj)
-                session.flush()  # Ensures NarratorID is generated for the new record
-
-            # Check if the narrator is already associated with the sanad
+                session.flush() 
             existing_association = session.query(narrator_sanad).filter(
-                narrator_sanad.c.NarratorID == narratorObj.NarratorID,
-                narrator_sanad.c.SanadID == _sanadID
+                narrator_sanad.c.narratorid == narratorObj.NarratorID,
+                narrator_sanad.c.sanadid == _sanadID
             ).first()
 
             if existing_association:
@@ -47,9 +45,9 @@ class NarratorDAO(AbsNarratorDAO):
             # Add the association to the narrator_sanad table
             session.execute(
                 narrator_sanad.insert().values(
-                    NarratorID=narratorObj.NarratorID,
-                    SanadID=_sanadID,
-                    Level=narratorTO.level
+                    narratorid=narratorObj.NarratorID,
+                    sanadid=_sanadID,
+                    level=narratorTO.level
                 )
             )
             
@@ -88,7 +86,7 @@ class NarratorDAO(AbsNarratorDAO):
             project = (
                 session.query(Project)
                 .options(joinedload(Project.sanads).joinedload(Sanad.narrators))
-                .filter_by(ProjectName=project_name)
+                .filter_by(projectname=project_name)
                 .first()
             )
             
@@ -110,7 +108,7 @@ class NarratorDAO(AbsNarratorDAO):
             narrator_names = []
             for sanad in sanads:
                 for narrator in sanad.narrators:
-                    narrator_names.append(narrator.NarratorName)
+                    narrator_names.append(narrator.narratorname)
 
             per_page = 100
             total_narrators = len(narrator_names)

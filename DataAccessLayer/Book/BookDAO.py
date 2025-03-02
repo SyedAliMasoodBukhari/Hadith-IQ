@@ -17,14 +17,14 @@ class BookDAO(AbsBookDAO):
         try:
             session: Session = self.__dbConnection.getSession()
 
-            project = session.query(Project).filter_by(ProjectName=projectName).first()
+            project = session.query(Project).filter_by(projectname=projectName).first()
             if not project:
                 print(f"Project '{projectName}' does not exist.")
                 return False
             
-            book = session.query(Book).filter_by(BookName=bookName).first()
+            book = session.query(Book).filter_by(bookname=bookName).first()
             if not book:
-                book = Book(BookName=bookName)
+                book = Book(bookname=bookName)
                 session.add(book)
                 session.commit()
 
@@ -93,11 +93,11 @@ class BookDAO(AbsBookDAO):
     def associate_book_with_project(self, book_name: str, project_name: str):
         try:
                 session: Session = self.__dbConnection.getSession()
-                book = session.query(Book).filter(Book.BookName == book_name).first()
+                book = session.query(Book).filter(Book.bookname == book_name).first()
                 if not book:
                     print(f"No book found with name '{book_name}'")
                     return False
-                project = session.query(Project).filter(Project.ProjectName == project_name).first()
+                project = session.query(Project).filter(Project.projectname == project_name).first()
                 if not project:
                     print(f"No project found with name '{project_name}'")
                     return False

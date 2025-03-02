@@ -10,9 +10,9 @@ class UtilDao:
     def getHadithId(self, matn: str) -> int:
         try:
             session: Session = self.__db_connection.getSession()
-            result = session.query(Hadith.HadithID).filter(Hadith.Matn == matn).first()
+            result = session.query(Hadith.hadithid).filter(Hadith.matn == matn).first()
             if result:
-                return result.HadithID
+                return result.hadithid
             return -1
         except SQLAlchemyError as e:
             print(f"Error fetching Hadith ID: {e}")
@@ -21,9 +21,9 @@ class UtilDao:
     def getSanadId(self, sanad: str) -> int:
         try:
             session: Session = self.__db_connection.getSession()
-            result = session.query(Sanad.SanadID).filter(Sanad.Sanad == sanad).first()
+            result = session.query(Sanad.sanadid).filter(Sanad.sanad == sanad).first()
             if result:
-                return result.SanadID
+                return result.sanadid
             return -1
         except SQLAlchemyError as e:
             print(f"Error fetching Sanad ID: {e}")
@@ -32,9 +32,9 @@ class UtilDao:
     def getNarratorId(self, narrator_name: str) -> int:
         try:
             session: Session = self.__db_connection.getSession()
-            result = session.query(Narrator.NarratorID).filter(Narrator.NarratorName == narrator_name).first()
+            result = session.query(Narrator.narratorid).filter(Narrator.narratorname == narrator_name).first()
             if result:
-                return result.NarratorID
+                return result.narratorid
             return -1
         except SQLAlchemyError as e:
             print(f"Error fetching Narrator ID: {e}")
@@ -43,9 +43,9 @@ class UtilDao:
     def getProjectId(self, project_name: str) -> int:
         try:
             session: Session = self.__db_connection.getSession()
-            result = session.query(Project.ProjectID).filter(Project.ProjectName == project_name).first()
+            result = session.query(Project.projectid).filter(Project.projectname == project_name).first()
             if result:
-                return result.ProjectID
+                return result.projectid
             return -1
         except SQLAlchemyError as e:
             print(f"Error fetching Project ID: {e}")
@@ -65,10 +65,10 @@ class UtilDao:
     def getBookId(self, book_name: str) -> int:
         try:
             cursor = self.__db_connection.getConnection().cursor()
-            query = "SELECT BookID FROM books WHERE BookName = %s LIMIT 1"
+            query = "SELECT bookid FROM books WHERE bookname = %s LIMIT 1"
             cursor.execute(query, (book_name,))
             result = cursor.fetchone()
             return result[0] if result else -1
         except Exception as e:
-            print(f"Error fetching Project ID: {e}")
+            print(f"Error fetching book Id: {e}")
             return -1

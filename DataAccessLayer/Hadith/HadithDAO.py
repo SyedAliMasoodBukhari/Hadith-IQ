@@ -17,19 +17,17 @@ class HadithDAO(AbsHadithDAO):
         try:
             session: Session = self.__dbConnection.getSession()
 
-            hadith = session.query(Hadith).filter_by(Matn=hadithTO.matn).first()
+            hadith = session.query(Hadith).filter_by(matn=hadithTO.matn).first()
             if not hadith:
                 hadith = Hadith(
-                    Matn=hadithTO.matn,
+                    matn=hadithTO.matn,
                     embeddings=hadithTO.matnEmbedding,
-                    cleanedMATN=hadithTO.cleanedMatn
+                    cleanedmatn=hadithTO.cleanedMatn
                 )
                 session.add(hadith)
                 session.commit()
 
-
-            # Associate the Hadith with the Project and Book
-            if hadith.HadithID: # if inserted
+            if hadith.hadithid:
                 print(f"Hadith inserted successfully: {hadithTO.matn}")
                 return self._insertHadithIntoJunction(session, projectName, hadithTO)
             else:
@@ -48,7 +46,7 @@ class HadithDAO(AbsHadithDAO):
         try:
             session = self.__dbConnection.getSession()
             # Fetch the Hadith record by its Matn (text)
-            hadith = session.query(Hadith).filter_by(Matn=matn).first()
+            hadith = session.query(Hadith).filter_by(matn=matn).first()
             if not hadith:
                 print(f"Hadith not found: {matn}")
                 return ""
@@ -63,18 +61,18 @@ class HadithDAO(AbsHadithDAO):
             first_level_narrators = (
                 session.query(Narrator)
                 .join(narrator_sanad)  # Join with the narrator_sanad table
-                .filter(narrator_sanad.c.SanadID == sanad_record.SanadID)  # Filter by the Sanad
-                .filter(narrator_sanad.c.Level == 1)  # Filter by Level 1
+                .filter(narrator_sanad.c.sanadid == sanad_record.sanadid)  # Filter by the Sanad
+                .filter(narrator_sanad.c.level == 1)  # Filter by Level 1
                 .all()
             )
 
             if not first_level_narrators:
-                print(f"No Level 1 Narrators found for Sanad: {sanad_record.Sanad}")
+                print(f"No Level 1 Narrators found for Sanad: {sanad_record.sanad}")
                 return ""
 
             # Assuming there is one narrator with Level 1, return their name
             narrator = first_level_narrators[0]
-            return narrator.NarratorName
+            return narrator.narratorname
 
         except SQLAlchemyError as e:
             print(f"Error fetching Hadith first narrator: {e}")
@@ -88,14 +86,14 @@ class HadithDAO(AbsHadithDAO):
         try:
             session: Session = self.__dbConnection.getSession()
 
-            project = session.query(Project).filter_by(ProjectName=projectName).first()
+            project = session.query(Project).filter_by(projectname=projectName).first()
             if not project:
                 raise ValueError(f"Project: '{projectName}' not found.")
 
             hadith_embeddings = {}
 
             for hadith in project.hadiths:
-                hadith_embeddings[hadith.Matn] = hadith.embeddings
+                hadith_embeddings[hadith.matn] = hadith.embeddings
 
             if not hadith_embeddings:
                 print(f"No Hadiths found for project: '{projectName}'.")
@@ -145,9 +143,9 @@ class HadithDAO(AbsHadithDAO):
 
     def _insertHadithIntoJunction(self, session: Session, projectName: str, hadithTO: HadithTO) -> bool:
         try:
-            book = session.query(Book).filter_by(BookName=hadithTO.bookName).first()
-            hadith = session.query(Hadith).filter_by(Matn=hadithTO.matn).first()
-            project = session.query(Project).filter_by(ProjectName=projectName).first()
+            book = session.query(Book).filter_by(bokname=hadithTO.bookName).first()
+            hadith = session.query(Hadith).filter_by(matn=hadithTO.matn).first()
+            project = session.query(Project).filter_by(projectname=projectName).first()
 
             if not book or not hadith or not project:
                 print(f"Book, Hadith or Project not found")
@@ -173,7 +171,7 @@ class HadithDAO(AbsHadithDAO):
         try:
             session: Session = self.__dbConnection.getSession()
             # Fetch the Book by its name
-            book = session.query(Book).filter_by(BookName=book_name).first()
+            book = session.query(Book).filter_by(bookname=book_name).first()
             if not book:
                 print(f"No book found with name '{book_name}'")
                 return False
@@ -184,7 +182,7 @@ class HadithDAO(AbsHadithDAO):
                 return False
 
             # Fetch the Project by its name
-            project = session.query(Project).filter_by(ProjectName=project_name).first()
+            project = session.query(Project).filter_by(projectname=project_name).first()
             if not project:
                 print(f"No project found with name '{project_name}'")
                 return False
@@ -206,7 +204,7 @@ class HadithDAO(AbsHadithDAO):
     def getAllHadithsOfProject(self, project_name: str, page: int) -> dict:
         try:
             session: Session = self.__dbConnection.getSession()
-            project = session.query(Project).filter_by(ProjectName=project_name).first()
+            project = session.query(Project).filter_by(projectname=project_name).first()
             print("here")
             if not project:
                 return {
@@ -223,8 +221,7 @@ class HadithDAO(AbsHadithDAO):
                     "current_page": page,
                 }
 
-            hadiths_list = [ hadith.Matn for hadith in hadiths]
-            print("separated MAtn")
+            hadiths_list = [{"id": hadith.id, "matn": hadith.matn} for hadith in hadiths]
             per_page = 100
             total_hadiths = len(hadiths_list)
             print(total_hadiths)

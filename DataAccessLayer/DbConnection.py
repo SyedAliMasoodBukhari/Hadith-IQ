@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-import mysql.connector
-from mysql.connector import Error
+import psycopg2
+from psycopg2 import OperationalError
 from threading import Lock
 import configparser
 import os
@@ -20,10 +20,10 @@ class DbConnectionModel:
 
     def __initialize(self):
         self.__DB_URL = None
+        self.__DB_PORT = None
         self.__DB_USER = None
         self.__DB_PASSWORD = None
         self.__DATABASE = None
-        self.__PORT = None
         self.__engine = None
         self.__SessionFactory = None
         self.__dbConnection = None
@@ -39,43 +39,39 @@ class DbConnectionModel:
 
         if 'database' in config:
             self.__DB_URL = config['database'].get('DB_URL')
+            self.__DB_PORT = config['database'].get('DB_PORT', '5432')
             self.__DB_USER = config['database'].get('DB_USER')
             self.__DB_PASSWORD = config['database'].get('DB_PASSWORD')
             self.__DATABASE = config['database'].get('DATABASE')
-            self.__PORT = config['database'].get('PORT')
 
         if not all([self.__DB_URL, self.__DB_USER, self.__DATABASE]):
             raise ValueError("Database configuration is incomplete in 'config.properties'.")
-
-        # SQLAlchemy connection string
-        connection_string = f"mysql+mysqlconnector://{self.__DB_USER}:{self.__DB_PASSWORD}@{self.__DB_URL}:{self.__PORT}/{self.__DATABASE}"
-        
-        # Create SQLAlchemy engine and session factory
+        connection_string = f"postgresql+psycopg2://{self.__DB_USER}:{self.__DB_PASSWORD}@{self.__DB_URL}:{self.__DB_PORT}/{self.__DATABASE}"
         self.__engine = create_engine(connection_string, pool_pre_ping=True)
         self.__SessionFactory = scoped_session(sessionmaker(bind=self.__engine))
 
     def getConnection(self):
         with self.__lock:
-            if self.__dbConnection is None or not self.__dbConnection.is_connected():
+            if self.__dbConnection is None or self.__dbConnection.closed:
                 try:
-                    self.__dbConnection = mysql.connector.connect(
+                    self.__dbConnection = psycopg2.connect(
                         host=self.__DB_URL,
+                        port=self.__DB_PORT,
                         user=self.__DB_USER,
                         password=self.__DB_PASSWORD,
-                        database=self.__DATABASE,
-                        port=int(self.__PORT)
+                        database=self.__DATABASE
                     )
-                    if self.__dbConnection.is_connected():
-                        print("Connected to the database")
-                except Error as e:
-                    print(f"Failed to connect to database: {e}")
+                    if self.__dbConnection.status == psycopg2.extensions.STATUS_READY:
+                        print("Connected to the PostgreSQL database")
+                except OperationalError as e:
+                    print(f"Failed to connect to PostgreSQL database: {e}")
                     self.__dbConnection = None
             return self.__dbConnection
 
     def closeConnection(self):
-        if self.__dbConnection and self.__dbConnection.is_connected():
+        if self.__dbConnection and not self.__dbConnection.closed:
             self.__dbConnection.close()
-            print("Database connection closed")
+            print("PostgreSQL database connection closed")
             self.__dbConnection = None
 
     def getConnectionUrl(self):
@@ -86,7 +82,7 @@ class DbConnectionModel:
         if conn:
             return conn.cursor()
         else:
-            raise ConnectionError("Database connection is not established.")
+            raise ConnectionError("PostgreSQL database connection is not established.")
 
     def getSession(self):
         if not self.__SessionFactory:
@@ -104,13 +100,13 @@ class DbConnectionModel:
     def closeEngine(self):
         if self.__engine:
             self.__engine.dispose()
-            print("Database engine disposed.")
+            print("PostgreSQL database engine disposed.")
 
     def testConnection(self):
         try:
             with self.__engine.connect() as connection:
                 connection.execute("SELECT 1")
-                print("Database connection test successful.")
+                print("PostgreSQL database connection test successful.")
         except Exception as e:
-            print(f"Failed to test database connection: {e}")
+            print(f"Failed to test PostgreSQL database connection: {e}")
             raise

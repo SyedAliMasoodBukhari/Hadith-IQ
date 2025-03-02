@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import Dict, Any,List
 
 class ProjectRequest(BaseModel):
     projectName: str
@@ -11,11 +11,23 @@ class RenameProjectRequest(BaseModel):
 class SaveProjectStateRequest(BaseModel):
     projectName: str
     stateQuery:str
-    stateData: Dict[str, Any]  #this for JSON data
-
+    stateData: List[str]  
+    
 class GetProjectStateRequest(BaseModel):
     projectName: str
     
 class GetSingleProjectStateRequest(BaseModel):
     stateQuery:str
     projectName: str
+
+class MergeProjectStateRequest(BaseModel):
+    projectName:str
+    querynames:List[str]
+    queryName:str
+class RenameProjectStateRequest(BaseModel):
+    projectName:str
+    oldQueryName:str
+    newQueryName:str
+class DeleteProjectStateRequest(BaseModel):
+    projectName:str
+    queryName:str

@@ -28,6 +28,6 @@ class ExpandSearchResponse(BaseModel):
     results: List[ExpandSearchResult] 
 
 class GetAllProjectHadithsResponse(BaseModel):
-    results: List[str]
+    results: dict
     totalPages:int
     currentpage:int

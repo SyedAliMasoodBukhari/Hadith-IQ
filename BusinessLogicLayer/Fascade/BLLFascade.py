@@ -41,14 +41,21 @@ class BLLFascade(AbsBLLFascade):
     def getProjects(self) -> List[ProjectTO]:
         return self.__projectBO.getProjects()
     
-    def saveProjectState(self,name:str, stateData: dict,query:str)->bool:
+    def saveProjectState(self,name:str, stateData: List[str],query:str)->bool:
         return self.__projectBO.saveProjectState(name,stateData,query)
     
-    def getProjectState(self,name:str)->dict:
+    def getProjectState(self,name:str)->List[str]:
         return  self.__projectBO.getProjectState(name)
 
     def getSingleProjectState(self,name:str,query:str)->dict:
       return self.__projectBO.getSingleProjectState(name,query)
+    
+    def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
+        return self.__projectBO.mergeProjectState(projectname,query_names,queryname)
+    def renameQueryOfState(self, project_name: str, old_query_name: str, new_query_name: str) -> bool:
+        return self.__projectBO.renameQueryOfState(project_name,old_query_name,new_query_name)
+    def deleteState(self, project_name: str, query_name: str) -> bool:
+        return self.__projectBO.deleteState(project_name,query_name)
       
     # AbsHadithBo Functions
 

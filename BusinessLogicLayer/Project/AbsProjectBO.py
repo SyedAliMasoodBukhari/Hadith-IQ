@@ -24,12 +24,22 @@ class AbsProjectBO(ABC):
         pass
 
     @abstractmethod
-    def saveProjectState(self,name:str, stateData: dict,query:str)->bool:
+    def saveProjectState(self,name:str, stateData: List[str],query:str)->bool:
         pass
 
     @abstractmethod
-    def getProjectState(self,name:str)->dict:
+    def getProjectState(self,name:str)->List[str]:
         pass
     @abstractmethod
     def getSingleProjectState(self,name:str,query:str)->dict:
       pass
+    @abstractmethod
+    def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
+        pass
+    @abstractmethod
+    def renameQueryOfState(self, project_name: str, old_query_name: str, new_query_name: str) -> bool:
+        pass
+    @abstractmethod
+    def deleteState(self, project_name: str, query_name: str) -> bool:
+        pass
+

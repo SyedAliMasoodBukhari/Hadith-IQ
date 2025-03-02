@@ -56,12 +56,19 @@ class ProjectBO(AbsProjectBO):
             print(f"Failed to rename Project: {currName}")
             return False
         return True
-    def saveProjectState(self,name:str, stateData: dict,query:str)->bool:
+    def saveProjectState(self,name:str, stateData: List[str],query:str)->bool:
         return self.__dalFascade.saveProjectState(name,stateData,query)
     
-    def getProjectState(self,name:str)->dict:
+    def getProjectState(self,name:str)->List[str]:
         return self.__dalFascade.getProjectState(name)
     
     def getSingleProjectState(self,name:str,query:str)->dict:
       return self.__dalFascade.getSingleProjectState(name,query)
+    
+    def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
+        return self.__dalFascade.mergeProjectState(projectname,query_names,queryname)
+    def renameQueryOfState(self, project_name: str, old_query_name: str, new_query_name: str) -> bool:
+        return self.__dalFascade.renameQueryOfState(project_name,old_query_name,new_query_name)
+    def deleteState(self, project_name: str, query_name: str) -> bool:
+        return self.__dalFascade.deleteState(project_name,query_name)
       

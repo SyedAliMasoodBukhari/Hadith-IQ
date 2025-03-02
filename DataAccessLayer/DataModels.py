@@ -1,63 +1,60 @@
 from sqlalchemy import (
-    Column, DateTime, Integer, String, ForeignKey, Table, Text, PrimaryKeyConstraint,JSON
+    create_engine, Column, Integer, String, Float, ForeignKey, Table, DateTime, Text, JSON
 )
 from datetime import datetime, timezone
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import JSONB  # For better JSON support in PostgreSQL
 
+# Base for models
 Base = declarative_base()
 
 # Association Tables for Many-to-Many Relationships
 book_project = Table(
     'book_project', Base.metadata,
-    Column('ProjectID', Integer, ForeignKey('projects.ProjectID', ondelete="CASCADE"), primary_key=True),
-    Column('BookID', Integer, ForeignKey('books.BookID', ondelete="CASCADE"), primary_key=True),
-    # PrimaryKeyConstraint('ProjectID', 'BookID', name='pk_book_project')
+    Column('projectid', Integer, ForeignKey('projects.projectid', ondelete="CASCADE"), primary_key=True),
+    Column('bookid', Integer, ForeignKey('books.bookid', ondelete="CASCADE"), primary_key=True),
 )
 
 hadith_book = Table(
     'hadith_book', Base.metadata,
-    Column('BookID', Integer, ForeignKey('books.BookID', ondelete="CASCADE"), primary_key=True),
-    Column('HadithID', Integer, ForeignKey('hadiths.HadithID', ondelete="CASCADE"), primary_key=True),
-    # PrimaryKeyConstraint('BookID', 'HadithID', name='pk_hadith_book')
+    Column('bookid', Integer, ForeignKey('books.bookid', ondelete="CASCADE"), primary_key=True),
+    Column('hadithid', Integer, ForeignKey('hadiths.hadithid', ondelete="CASCADE"), primary_key=True),
 )
 
 hadith_project = Table(
     'hadith_project', Base.metadata,
-    Column('ProjectID', Integer, ForeignKey('projects.ProjectID', ondelete="CASCADE"), primary_key=True),
-    Column('HadithID', Integer, ForeignKey('hadiths.HadithID', ondelete="CASCADE"), primary_key=True),
-    # PrimaryKeyConstraint('ProjectID', 'HadithID', name='pk_hadith_project')
+    Column('projectid', Integer, ForeignKey('projects.projectid', ondelete="CASCADE"), primary_key=True),
+    Column('hadithid', Integer, ForeignKey('hadiths.hadithid', ondelete="CASCADE"), primary_key=True),
 )
 
 sanad_project = Table(
     'sanad_project', Base.metadata,
-    Column('ProjectID', Integer, ForeignKey('projects.ProjectID', ondelete="CASCADE"), primary_key=True),
-    Column('SanadID', Integer, ForeignKey('sanad.SanadID', ondelete="CASCADE"), primary_key=True),
-    # PrimaryKeyConstraint('ProjectID', 'SanadID', name='pk_sanad_project')
+    Column('projectid', Integer, ForeignKey('projects.projectid', ondelete="CASCADE"), primary_key=True),
+    Column('sanadid', Integer, ForeignKey('sanad.sanadid', ondelete="CASCADE"), primary_key=True),
 )
 
 hadith_sanad = Table(
     'hadith_sanad', Base.metadata,
-    Column('HadithID', Integer, ForeignKey('hadiths.HadithID', ondelete="CASCADE"), primary_key=True),
-    Column('SanadID', Integer, ForeignKey('sanad.SanadID', ondelete="CASCADE"), primary_key=True),
-    # PrimaryKeyConstraint('HadithID', 'SanadID', name='pk_hadith_sanad')
+    Column('hadithid', Integer, ForeignKey('hadiths.hadithid', ondelete="CASCADE"), primary_key=True),
+    Column('sanadid', Integer, ForeignKey('sanad.sanadid', ondelete="CASCADE"), primary_key=True),
 )
 
 narrator_sanad = Table(
     'narrator_sanad', Base.metadata,
-    Column('SanadID', Integer, ForeignKey('sanad.SanadID', ondelete="CASCADE"), primary_key=True),
-    Column('NarratorID', Integer, ForeignKey('narrators.NarratorID', ondelete="CASCADE"), primary_key=True),
-    Column('Level', Integer, nullable=False),
-    # PrimaryKeyConstraint('SanadID', 'NarratorID', name='pk_narrator_sanad')
+    Column('sanadid', Integer, ForeignKey('sanad.sanadid', ondelete="CASCADE"), primary_key=True),
+    Column('narratorid', Integer, ForeignKey('narrators.narratorid', ondelete="CASCADE"), primary_key=True),
+    Column('level', Integer, nullable=False),
 )
 
 # Models
 class Project(Base):
     __tablename__ = 'projects'
-    ProjectID = Column(Integer, primary_key=True, autoincrement=True)
-    ProjectName = Column(String(100), nullable=False, unique=True)
-    LastUpdated = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-    CreatedAt = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    projectid = Column(Integer, primary_key=True, autoincrement=True)
+    projectname = Column(String(100), nullable=False, unique=True)
+    lastupdated = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    createdat = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     books = relationship(
         'Book',
@@ -79,25 +76,26 @@ class Project(Base):
     )
     project_state = relationship("ProjectState", back_populates="projects")
 
-
     def __repr__(self):
-        return f"<Project(ProjectID={self.ProjectID}, ProjectName='{self.ProjectName}', LastUpdated={self.LastUpdated}, CreatedAt={self.CreatedAt})>"
+        return f"<Project(projectid={self.projectid}, projectname='{self.projectname}', lastupdated={self.lastupdated}, createdat={self.createdat})>"
 
 class ProjectState(Base):
     __tablename__ = 'project_state'
-    ProjectID = Column(Integer, ForeignKey('projects.ProjectID', ondelete="CASCADE"), primary_key=True)
-    Query=Column(String(10,000),nullable=False,unique=True)
-    StateData = Column(JSON, nullable=False)
+    
+    projectid = Column(Integer, ForeignKey('projects.projectid', ondelete="CASCADE"), primary_key=True)
+    query=Column(String(10,000),nullable=False,unique=True)
+    statedata = Column(JSONB, nullable=False)
 
     projects = relationship('Project', back_populates='project_state')
 
     def __repr__(self):
-        return f"<ProjectState(ProjectID={self.ProjectID}, Query={self.Query},StateData='{self.StateData}')>"
+        return f"<ProjectState(projectid={self.projectid},query='{self.query}', statedata='{self.statedata}')>"
 
 class Book(Base):
     __tablename__ = 'books'
-    BookID = Column(Integer, primary_key=True, autoincrement=True)
-    BookName = Column(String(200), nullable=False, unique=True)
+    
+    bookid = Column(Integer, primary_key=True, autoincrement=True)
+    bookname = Column(String(200), nullable=False, unique=True)
 
     projects = relationship(
         'Project',
@@ -111,15 +109,15 @@ class Book(Base):
     )
 
     def __repr__(self):
-        return f"<Book(BookID={self.BookID}, BookName='{self.BookName}')>"
-
+        return f"<Book(bookid={self.bookid}, bookname='{self.bookname}')>"
 
 class Hadith(Base):
     __tablename__ = 'hadiths'
-    HadithID = Column(Integer, primary_key=True, autoincrement=True)
-    Matn = Column(String(5000), nullable=False, unique=True)
+    
+    hadithid = Column(Integer, primary_key=True, autoincrement=True)
+    matn = Column(String(5000), nullable=False, unique=True)
     embeddings = Column(Text, nullable=False)
-    cleanedMATN = Column(String(5000), nullable=False)
+    cleanedmatn = Column(String(5000), nullable=False)
 
     projects = relationship(
         'Project',
@@ -138,14 +136,14 @@ class Hadith(Base):
     )
 
     def __repr__(self):
-        return f"<Hadith(HadithID={self.HadithID}, Matn='{self.Matn}', cleanedMATN='{self.cleanedMATN}')>"
-
+        return f"<Hadith(hadithid={self.hadithid}, matn='{self.matn}', cleanedmatn='{self.cleanedmatn}')>"
 
 class Sanad(Base):
     __tablename__ = 'sanad'
-    SanadID = Column(Integer, primary_key=True, autoincrement=True)
-    Sanad = Column(String(5000), nullable=False, unique=True)
-    SanadAuthenticity = Column(Integer, nullable=False)
+    
+    sanadid = Column(Integer, primary_key=True, autoincrement=True)
+    sanad = Column(String(5000), nullable=False, unique=True)
+    sanadauthenticity = Column(Integer, nullable=False)
 
     projects = relationship(
         'Project',
@@ -165,14 +163,14 @@ class Sanad(Base):
     )
 
     def __repr__(self):
-        return f"<Sanad(SanadID={self.SanadID}, Sanad='{self.Sanad}', SanadAuthenticity={self.SanadAuthenticity})>"
-
+        return f"<Sanad(sanadid={self.sanadid}, sanad='{self.sanad}', sanadauthenticity={self.sanadauthenticity})>"
 
 class Narrator(Base):
     __tablename__ = 'narrators'
-    NarratorID = Column(Integer, primary_key=True, autoincrement=True)
-    NarratorName = Column(String(200), nullable=False, unique=True)
-    NarratorAuthenticity = Column(Integer, nullable=False)
+    
+    narratorid = Column(Integer, primary_key=True, autoincrement=True)
+    narratorname = Column(String(200), nullable=False, unique=True)
+    narratorauthenticity = Column(Integer, nullable=False)
 
     sanads = relationship(
         'Sanad',
@@ -181,23 +179,30 @@ class Narrator(Base):
     )
 
     def __repr__(self):
-        return f"<Narrator(NarratorID={self.NarratorID}, NarratorName='{self.NarratorName}', NarratorAuthenticity={self.NarratorAuthenticity})>"
+        return f"<Narrator(narratorid={self.narratorid}, narratorname='{self.narratorname}', narratorauthenticity={self.narratorauthenticity})>"
 
+# Progress model for tracking task progress
+class Progress(Base):
+    __tablename__ = "import_progress"
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    taskid = Column(String(50), unique=True, nullable=False)
+    projectname = Column(String(100), nullable=False)
+    progress = Column(Float, default=0.0)
 
-# # Task progress model
-# class Progress(Base):
-#     def __init__(self, dbConnection: DbConnection):
-#         self.__dbConnection = dbConnection
-        
-#     __tablename__ = "import_progress"
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     task_id = Column(String(50), unique=True, nullable=False)
-#     project_name = Column(String(100), nullable=False)
-#     progress = Column(Float, default=0.0)
+    # Database configuration for PostgreSQL
+    @staticmethod
+    def init_db(db_url):
+        """
+        Initialize the database.
+        :param db_url: Database URL (PostgreSQL URL)
+        """
+        engine = create_engine(db_url)  # Replace with your PostgreSQL connection string
+        Base.metadata.create_all(engine)
+        Session = sessionmaker(bind=engine)
+        return Session
 
-#     # Database configuration
-#     def init_db():
-#         engine = create_engine(self.__dbConnection.getConnectionUrl())
-#         Base.metadata.create_all(engine)
-#         Session = sessionmaker(bind=engine)
-#         return Session
+# Example Usage:
+# PostgreSQL connection URL
+# db_url = "postgresql://username:password@localhost:5432/mydatabase"
+# session = Progress.init_db(db_url)

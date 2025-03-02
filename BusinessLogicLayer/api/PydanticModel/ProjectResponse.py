@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import Dict, Any,List
 
 class ProjectResponse(BaseModel):
     projectName: str
@@ -7,8 +7,18 @@ class ProjectResponse(BaseModel):
     createdAt: str
 
 class GetProjectStateResponse(BaseModel):
-    stateQuery:str
-    stateData: Dict[str, Any]
+    stateQuery:List[str]
 
 class GetSingleProjectStateResponse(BaseModel):
-    stateData: Dict[str, Any]
+    query:str
+    stateData: List[str]
+
+class MergeProjectStateResponse(BaseModel):
+    message:str
+    success:bool
+class RenameProjectStateResponse(BaseModel):
+    message:str
+    success:bool
+class DeleteProjectStateResponse(BaseModel):
+    message:str
+    success:bool
