@@ -12,6 +12,11 @@ class SaveProjectStateRequest(BaseModel):
     projectName: str
     stateQuery:str
     stateData: List[str]  
+
+class RemoveHadithRequest(BaseModel):
+    matn: List[str]
+    projectName: str 
+    stateQuery: str  
     
 class GetProjectStateRequest(BaseModel):
     projectName: str

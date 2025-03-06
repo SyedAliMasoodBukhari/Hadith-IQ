@@ -33,7 +33,7 @@ class AbsProjectDAO(ABC):
         pass
 
     @abstractmethod
-    def getSingleProjectState(self,name:str,query:str)->dict:
+    def getSingleProjectState(self,name:str,query:str)->List[str]:
       pass
 
     @abstractmethod
@@ -45,4 +45,7 @@ class AbsProjectDAO(ABC):
     @abstractmethod
     def deleteState(self, project_name: str, query_name: str) -> bool:
         pass
-
+    @abstractmethod
+    def removeHadithFromState(self, matn: List[str], projectName: str, stateQuery: str) -> bool:
+        pass
+    

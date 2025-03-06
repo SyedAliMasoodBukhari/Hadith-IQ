@@ -22,3 +22,8 @@ class RenameProjectStateResponse(BaseModel):
 class DeleteProjectStateResponse(BaseModel):
     message:str
     success:bool
+
+
+class RemoveHadithResponse(BaseModel):
+    success: bool  
+    message: str 

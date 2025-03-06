@@ -34,8 +34,11 @@ class AbsDALFascade(ABC):
         pass
 
     @abstractmethod
-    def getSingleProjectState(self,name:str,query:str)->dict:
+    def getSingleProjectState(self,name:str,query:str)->List[str]:
       pass
+    @abstractmethod
+    def removeHadithFromState(self, matn: List[str], projectName: str, stateQuery: str) -> bool:
+        pass
 
     @abstractmethod
     def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
@@ -46,6 +49,7 @@ class AbsDALFascade(ABC):
     @abstractmethod
     def deleteState(self, project_name: str, query_name: str) -> bool:
         pass
+    
 
     @abstractmethod
     def insertBook(self,projectName:str,bookName:str)->bool:

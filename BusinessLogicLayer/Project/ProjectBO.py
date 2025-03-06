@@ -62,8 +62,10 @@ class ProjectBO(AbsProjectBO):
     def getProjectState(self,name:str)->List[str]:
         return self.__dalFascade.getProjectState(name)
     
-    def getSingleProjectState(self,name:str,query:str)->dict:
+    def getSingleProjectState(self,name:str,query:str)->List[str]:
       return self.__dalFascade.getSingleProjectState(name,query)
+    def removeHadithFromState(self, matn: List[str], projectName: str, stateQuery: str) -> bool:
+        return self.__dalFascade.removeHadithFromState(matn,projectName,stateQuery)
     
     def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
         return self.__dalFascade.mergeProjectState(projectname,query_names,queryname)
@@ -71,4 +73,5 @@ class ProjectBO(AbsProjectBO):
         return self.__dalFascade.renameQueryOfState(project_name,old_query_name,new_query_name)
     def deleteState(self, project_name: str, query_name: str) -> bool:
         return self.__dalFascade.deleteState(project_name,query_name)
+    
       

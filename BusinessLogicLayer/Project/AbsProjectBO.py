@@ -31,8 +31,11 @@ class AbsProjectBO(ABC):
     def getProjectState(self,name:str)->List[str]:
         pass
     @abstractmethod
-    def getSingleProjectState(self,name:str,query:str)->dict:
+    def getSingleProjectState(self,name:str,query:str)->List[str]:
       pass
+    @abstractmethod
+    def removeHadithFromState(self, matn: List[str], projectName: str, stateQuery: str) -> bool:
+        pass
     @abstractmethod
     def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
         pass
@@ -42,4 +45,5 @@ class AbsProjectBO(ABC):
     @abstractmethod
     def deleteState(self, project_name: str, query_name: str) -> bool:
         pass
+    
 

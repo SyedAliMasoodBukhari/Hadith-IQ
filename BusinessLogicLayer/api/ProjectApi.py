@@ -1,8 +1,8 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from BusinessLogicLayer.Fascade.AbsBLLFascade import AbsBLLFascade
-from BusinessLogicLayer.api.PydanticModel.ProjectRequest import ProjectRequest, RenameProjectRequest,SaveProjectStateRequest,GetProjectStateRequest,GetSingleProjectStateRequest,MergeProjectStateRequest,RenameProjectStateRequest,DeleteProjectStateRequest
-from BusinessLogicLayer.api.PydanticModel.ProjectResponse import ProjectResponse,GetProjectStateResponse,GetSingleProjectStateResponse,MergeProjectStateResponse,RenameProjectStateResponse,DeleteProjectStateResponse
+from BusinessLogicLayer.api.PydanticModel.ProjectRequest import ProjectRequest, RenameProjectRequest,SaveProjectStateRequest,GetProjectStateRequest,GetSingleProjectStateRequest,MergeProjectStateRequest,RenameProjectStateRequest,DeleteProjectStateRequest,RemoveHadithRequest
+from BusinessLogicLayer.api.PydanticModel.ProjectResponse import ProjectResponse,GetProjectStateResponse,GetSingleProjectStateResponse,MergeProjectStateResponse,RenameProjectStateResponse,DeleteProjectStateResponse,RemoveHadithResponse
 def project_router(fascade: AbsBLLFascade):
     router = APIRouter()
 
@@ -61,11 +61,10 @@ def project_router(fascade: AbsBLLFascade):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
- 
-
     @router.post("/saveProjectState")
     async def saveProjectState(request: SaveProjectStateRequest):
             try:
+                print("mai idhr hunnn")
                 success = fascade.saveProjectState(request.projectName,request.stateData,request.stateQuery)
                 if success:
                     print("here2")
@@ -96,21 +95,22 @@ def project_router(fascade: AbsBLLFascade):
 
 
     @router.get("/getSingleProjectState", response_model=List[GetSingleProjectStateResponse])
-    async def getSingleProjectState(request:GetSingleProjectStateRequest):
+    async def getSingleProjectState(request: GetSingleProjectStateRequest):
         try:
-            projectState = fascade.getSingleProjectState(request.projectName,request.stateQuery)
+            projectState = fascade.getSingleProjectState(request.projectName, request.stateQuery)
             if not projectState:
                 return []
             response = [
-            GetSingleProjectStateResponse(
-              stateData=projectState["matn"],
-              query=projectState["query"]
-            )
+                GetSingleProjectStateResponse(
+                    stateData=projectState,  # Include matn for each hadith_id
+                    query=request.stateQuery      # Include the query
+                )
             ]
             return response
+
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        
+            
     @router.post("/mergeProjectState",response_model=List[MergeProjectStateResponse])
     async def mergeProjectState(request: MergeProjectStateRequest):
         try:
@@ -161,6 +161,23 @@ def project_router(fascade: AbsBLLFascade):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
+    @router.post("/removeHadithFromState", response_model=RemoveHadithResponse)
+    async def removeHadithFromStateQuery(request: RemoveHadithRequest):
+        try:
+            success = fascade.removeHadithFromState(request.matn, request.projectName, request.stateQuery)
+            if success:
+                return RemoveHadithResponse(
+                    success=True,
+                    message="Hadith ID successfully removed from stateQuery.",
+                )
+            else:
+                return RemoveHadithResponse(
+                    success=False,
+                    message="Failed to remove Hadith ID from stateQuery.",
+                )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+            
     
 
 

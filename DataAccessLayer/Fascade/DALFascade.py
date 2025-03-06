@@ -39,7 +39,7 @@ class DALFascade(AbsDALFascade):
     
     def getProjectState(self,name:str)->List[str]:
         return self.__projectDAO.getProjectState(name)
-    def getSingleProjectState(self,name:str,query:str)->dict:
+    def getSingleProjectState(self,name:str,query:str)->List[str]:
       return self.__projectDAO.getSingleProjectState(name,query)
     def mergeProjectState(self, projectname: str, query_names: List[str], queryname: str) -> bool:
         return self.__projectDAO.mergeProjectState(projectname,query_names,queryname)
@@ -47,6 +47,8 @@ class DALFascade(AbsDALFascade):
         return self.__projectDAO.renameQueryOfState(project_name,old_query_name,new_query_name)
     def deleteState(self, project_name: str, query_name: str) -> bool:
         return self.__projectDAO.deleteState(project_name,query_name)
+    def removeHadithFromState(self, matn: List[str], projectName: str, stateQuery: str) -> bool:
+        return self.__projectDAO.removeHadithFromState(matn,projectName,stateQuery)
       
     
     #AbsBook Functions
