@@ -32,13 +32,17 @@ class GetAllProjectHadithsResponse(BaseModel):
     totalPages:int
     currentpage:int
 
-class NarratorDetail(BaseModel):
+class NarratorDetails(BaseModel):
     narrator_name: str
     level: int
 
+class SanadDetails(BaseModel):
+    authenticity: str
+    narrators: List[NarratorDetails]
+
 class HadithDetailsResponse(BaseModel):
     matn: str
-    narrators: List[NarratorDetail]
+    sanads: List[SanadDetails]
     books: List[str]
     
 

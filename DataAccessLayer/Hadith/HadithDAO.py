@@ -251,26 +251,32 @@ class HadithDAO(AbsHadithDAO):
             if not hadith:
                 print(f"Hadith not found with matn: {matn}")
                 return {}
-            narrators_details = (
-                session.query(Narrator.narratorname, narrator_sanad.c.level)
-                .join(narrator_sanad, Narrator.narratorid == narrator_sanad.c.narratorid)
-                .join(Sanad, Sanad.sanadid == narrator_sanad.c.sanadid)
-                .join(hadith_sanad, hadith_sanad.c.sanadid == Sanad.sanadid) 
-                .filter(hadith_sanad.c.hadithid == hadith.hadithid) 
-                .order_by(narrator_sanad.c.level)
-                .all()
-            )
 
-            narrators_list = [
-                {"narrator_name": narrator, "level": level} 
-                for narrator, level in narrators_details
-            ]
+            sanad_details = []
+            for sanad in hadith.sanads: 
+                narrators_details = (
+                    session.query(Narrator.narratorname, narrator_sanad.c.level)
+                    .join(narrator_sanad, Narrator.narratorid == narrator_sanad.c.narratorid)
+                    .filter(narrator_sanad.c.sanadid == sanad.sanadid)
+                    .order_by(narrator_sanad.c.level)
+                    .all()
+                )
+
+                narrators_list = [
+                    {"narrator_name": narrator, "level": level} 
+                    for narrator, level in narrators_details
+                ]
+
+                sanad_details.append({
+                    "authenticity": sanad.sanadauthenticity,
+                    "narrators": narrators_list
+                })
 
             book_names = [book.bookname for book in hadith.books]
 
             hadith_details = {
                 "matn": hadith.matn,
-                "narrators": narrators_list, 
+                "sanads": sanad_details,
                 "books": book_names
             }
 

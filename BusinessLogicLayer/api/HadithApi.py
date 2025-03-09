@@ -107,9 +107,11 @@ def hadith_router(fascade: AbsBLLFascade):
     async def get_hadith_details(request:GetHadithDetails ):
         try:
             hadith=fascade.getHadithDetails(request.matn)
-            return HadithDetailsResponse(matn= hadith["matn"],
-                                        narrators=hadith["narrators"],
-                                        books=hadith["books"])
+            return HadithDetailsResponse(
+            matn=hadith["matn"],
+            sanads=hadith["sanads"],
+            books=hadith["books"]
+        )
 
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
