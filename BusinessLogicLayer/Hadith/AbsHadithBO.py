@@ -38,3 +38,6 @@ class AbsHadithBO(ABC):
     
     def importHadithFileCSV(self, filePath: str) -> bool:
         pass
+    @abstractmethod
+    def getHadithDetails(self, matn: str) -> dict:
+        pass

@@ -1,8 +1,8 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from BusinessLogicLayer.Fascade.AbsBLLFascade import AbsBLLFascade
-from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest,ImportBookRequest
-from BusinessLogicLayer.api.PydanticModel.HadithResponse import ExpandSearchResponse, ExpandSearchResult, SemanticSearchResponse,SortResultResponse,GetAllProjectHadithsResponse
+from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest,ImportBookRequest,GetHadithDetails
+from BusinessLogicLayer.api.PydanticModel.HadithResponse import ExpandSearchResponse, ExpandSearchResult, SemanticSearchResponse,SortResultResponse,GetAllProjectHadithsResponse,HadithDetailsResponse
 from BusinessLogicLayer.api.PydanticModel.HadithResponse import SemanticSearchResult ,SortResultResult
 
 def hadith_router(fascade: AbsBLLFascade):
@@ -12,7 +12,7 @@ def hadith_router(fascade: AbsBLLFascade):
     async def import_hadith(request: ImportBookRequest):
         try:
             # Call the function from your BLL
-            success = fascade.importHadithFile(request.filePath)
+            success = fascade.importHadithFile(projectName=request.projectName,filePath=request.filePath)
             if success:
                 return {"message": "File imported successfully!"}
             else:
@@ -89,20 +89,28 @@ def hadith_router(fascade: AbsBLLFascade):
 
     
    
-    @router.get("/getAllProjectHadiths",response_model=GetAllProjectHadithsResponse)
-    async def get_all_project_hadiths(request:GetAllProjectHadithsRequest):
+    @router.get("/getAllProjectHadiths",response_model=List[GetAllProjectHadithsResponse])
+    async def get_all_project_hadiths(projectName:str,page:int):
         try:
-            print("api")
-            projectName=request.projectName
-            page=request.page
+
             hadith=fascade.getAllHadithsOfProject(projectName,page)
-            print("func called")
-            return GetAllProjectHadithsResponse(results=hadith["results"],  
+            return[ GetAllProjectHadithsResponse(results=hadith["results"],  
             totalPages=hadith["total_pages"],
-            currentpage=hadith["current_page"],)
+            currentpage=hadith["current_page"],)]
 
 
             
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        
+    @router.post("/getHadithsDetails",response_model=HadithDetailsResponse)
+    async def get_hadith_details(request:GetHadithDetails ):
+        try:
+            hadith=fascade.getHadithDetails(request.matn)
+            return HadithDetailsResponse(matn= hadith["matn"],
+                                        narrators=hadith["narrators"],
+                                        books=hadith["books"])
+
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 

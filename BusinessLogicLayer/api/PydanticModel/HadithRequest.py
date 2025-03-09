@@ -26,3 +26,5 @@ class FilePathRequest(BaseModel):
 class GetAllProjectHadithsRequest(BaseModel):
     projectName:str
     page:int
+class GetHadithDetails(BaseModel):
+    matn:str

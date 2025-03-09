@@ -28,6 +28,17 @@ class ExpandSearchResponse(BaseModel):
     results: List[ExpandSearchResult] 
 
 class GetAllProjectHadithsResponse(BaseModel):
-    results: dict
+    results: List[dict]
     totalPages:int
     currentpage:int
+
+class NarratorDetail(BaseModel):
+    narrator_name: str
+    level: int
+
+class HadithDetailsResponse(BaseModel):
+    matn: str
+    narrators: List[NarratorDetail]
+    books: List[str]
+    
+

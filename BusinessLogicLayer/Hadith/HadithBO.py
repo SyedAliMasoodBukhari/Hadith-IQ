@@ -132,6 +132,8 @@ class HadithBO(AbsHadithBO):
          
          
         return finalResult
+    def getHadithDetails(self, matn: str) -> dict:
+        return self.__dalFascade.getHadithDetails(matn)
     
     def process_entry(getActualMatn, clean_text, cleanHadithMatn, lemmatize, generateEmbeddings, hadith):
         _matn = hadith.get("matn")

@@ -95,6 +95,8 @@ class BLLFascade(AbsBLLFascade):
         self, HadithTO: List[str], projectName: str, threshold: float
     ) -> dict:
         return self.__hadithBO.expandSearch(HadithTO, projectName, threshold)
+    def getHadithDetails(self, matn: str) -> dict:
+        return self.__hadithBO.getHadithDetails(matn)
 
     # NarratorBO Functions
     ##

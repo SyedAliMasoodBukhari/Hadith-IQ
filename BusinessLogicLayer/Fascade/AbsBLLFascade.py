@@ -90,6 +90,9 @@ class AbsBLLFascade(ABC):
    @abstractmethod
    def expandSearch(self,HadithTO:List[str],projectName: str,threshold:float)->dict:
       pass
+   @abstractmethod
+   def getHadithDetails(self, matn: str) -> dict:
+      pass
      
    #AbsNarratorBO funtions
    @abstractmethod

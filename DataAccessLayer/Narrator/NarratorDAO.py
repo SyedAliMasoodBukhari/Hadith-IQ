@@ -13,28 +13,25 @@ class NarratorDAO(AbsNarratorDAO):
         self.__dbConnection = dbConnection
         self.__util=util
                 
-    def insertNarrator(self,sanad: str, narratorTO : NarratorTO)->bool:
+    def insertNarrator(self, sanad: str, narratorTO: NarratorTO) -> bool:
+        session: Session = self.__dbConnection.getSession()
         try:
-            session: Session = self.__dbConnection.getSession()
-
             sanadObj = session.query(Sanad).filter(Sanad.sanad == sanad).first()
             if not sanadObj:
                 print(f"Sanad '{sanad}' not found.")
                 return False
             
             _sanadID = sanadObj.sanadid
-
-            # Check if the narrator already exists
             narratorObj = session.query(Narrator).filter(Narrator.narratorname == narratorTO.narratorName).first()
             if not narratorObj:
                 narratorObj = Narrator(
                     narratorname=narratorTO.narratorName,
-                    narratorauthenticity="Authentic"  
+                    narratorauthenticity="Authentic"
                 )
                 session.add(narratorObj)
-                session.flush() 
+                session.flush()  
             existing_association = session.query(narrator_sanad).filter(
-                narrator_sanad.c.narratorid == narratorObj.NarratorID,
+                narrator_sanad.c.narratorid == narratorObj.narratorid,
                 narrator_sanad.c.sanadid == _sanadID
             ).first()
 
@@ -42,15 +39,14 @@ class NarratorDAO(AbsNarratorDAO):
                 print(f"Narrator '{narratorTO.narratorName}' is already associated with the sanad.")
                 return False
 
-            # Add the association to the narrator_sanad table
             session.execute(
                 narrator_sanad.insert().values(
-                    narratorid=narratorObj.NarratorID,
+                    narratorid=narratorObj.narratorid,
                     sanadid=_sanadID,
                     level=narratorTO.level
                 )
             )
-            
+
             session.commit()
             print(f"Narrator: '{narratorTO.narratorName}' added successfully.")
             return True
@@ -59,6 +55,10 @@ class NarratorDAO(AbsNarratorDAO):
             session.rollback()
             print(f"Error: {err}")
             return False
+
+        finally:
+            session.close()
+
     
     
     def getAllNarrators(self)->List[NarratorTO]:

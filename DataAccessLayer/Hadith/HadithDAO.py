@@ -1,4 +1,4 @@
-from DataAccessLayer.DataModels import Book, Hadith, Project,Narrator, narrator_sanad
+from DataAccessLayer.DataModels import Book, Hadith, Project,Narrator, narrator_sanad,Sanad,hadith_sanad
 from DataAccessLayer.Hadith.AbsHadithDAO import AbsHadithDAO
 from typing import List
 from DataAccessLayer.DbConnection import DbConnectionModel
@@ -212,12 +212,10 @@ class HadithDAO(AbsHadithDAO):
                     "current_page": page,
                 }
 
-            hadiths_list = [{"id": hadith.id, "matn": hadith.matn} for hadith in hadiths]
+            hadiths_list = [{"id": hadith.hadithid, "matn": hadith.matn} for hadith in hadiths]
             per_page = 100
             total_hadiths = len(hadiths_list)
-            print(total_hadiths)
-            total_pages = (total_hadiths + per_page - 1) // per_page  # Ceiling division
-            print(total_pages)
+            total_pages = (total_hadiths + per_page - 1) // per_page  
             if page > total_pages:
                 return {
                     "results": [],
@@ -227,7 +225,6 @@ class HadithDAO(AbsHadithDAO):
             start = (page - 1) * per_page
             end = start + per_page
             paginated_hadiths = hadiths_list[start:end]
-            print("divided list")
 
             return {
                 "results": paginated_hadiths,
@@ -243,5 +240,44 @@ class HadithDAO(AbsHadithDAO):
                 "total_pages": 0,
                 "current_page": page,
             }
+        finally:
+            session.close()
+    
+    def getHadithDetails(self, matn:str) -> dict:
+        try:
+            session: Session = self.__dbConnection.getSession()
+            
+            hadith = session.query(Hadith).filter_by(matn=matn).first()
+            if not hadith:
+                print(f"Hadith not found with matn: {matn}")
+                return {}
+            narrators_details = (
+                session.query(Narrator.narratorname, narrator_sanad.c.level)
+                .join(narrator_sanad, Narrator.narratorid == narrator_sanad.c.narratorid)
+                .join(Sanad, Sanad.sanadid == narrator_sanad.c.sanadid)
+                .join(hadith_sanad, hadith_sanad.c.sanadid == Sanad.sanadid) 
+                .filter(hadith_sanad.c.hadithid == hadith.hadithid) 
+                .order_by(narrator_sanad.c.level)
+                .all()
+            )
+
+            narrators_list = [
+                {"narrator_name": narrator, "level": level} 
+                for narrator, level in narrators_details
+            ]
+
+            book_names = [book.bookname for book in hadith.books]
+
+            hadith_details = {
+                "matn": hadith.matn,
+                "narrators": narrators_list, 
+                "books": book_names
+            }
+
+            return hadith_details
+
+        except SQLAlchemyError as e:
+            print(f"Error fetching Hadith details: {e}")
+            return {}
         finally:
             session.close()

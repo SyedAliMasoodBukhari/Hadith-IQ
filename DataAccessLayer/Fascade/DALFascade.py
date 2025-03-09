@@ -85,6 +85,8 @@ class DALFascade(AbsDALFascade):
         return self.__hadithDAO.associate_hadiths_with_project(book_name,projectName)
     def getAllHadithsOfProject(self, projectName: str,page:int) -> dict:
         return self.__hadithDAO.getAllHadithsOfProject(projectName,page)
+    def getHadithDetails(self, matn: str) -> dict:
+        return self.__hadithDAO.getHadithDetails(matn)
     
     #AbsSanad Function
     

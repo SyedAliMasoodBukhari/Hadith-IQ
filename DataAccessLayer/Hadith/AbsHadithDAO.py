@@ -25,3 +25,6 @@ class AbsHadithDAO(ABC):
     @abstractmethod
     def getAllHadithsOfProject(self, project_name: str,page:int) -> dict:
         pass
+    @abstractmethod
+    def getHadithDetails(self, matn: str) -> dict:
+        pass

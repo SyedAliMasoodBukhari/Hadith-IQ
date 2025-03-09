@@ -87,6 +87,9 @@ class AbsDALFascade(ABC):
     @abstractmethod
     def getAllHadithsOfProject(self, projectName: str,page:int) -> dict:
         pass
+    @abstractmethod
+    def getHadithDetails(self, matn: str) -> dict:
+        pass
     
     @abstractmethod
     def getProjectHadithsEmbedding(self, projectName:str) -> dict:
