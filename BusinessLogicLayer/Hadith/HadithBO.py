@@ -71,9 +71,9 @@ class HadithBO(AbsHadithBO):
             return False
 
 
-    def importHadithFilesssss(self, projectName: str, filePath: str) -> bool:
+    def importHadithFileCSV(self, filePath: str) -> bool:
         
-        bookData = self.dalFascade.importBook(projectName, filePath)
+        bookData = self.dalFascade.importBook(filePath)
         if not bookData:
           print("No book data found.")
           
@@ -113,16 +113,16 @@ class HadithBO(AbsHadithBO):
          _sanad = hadith.get("sanad")
          if _matn and _bookName and _sanad:
             # Insert Book record
-            if self.__dalFascade.insertBook(projectName, _bookName):
+            if self.__dalFascade.insertBook( _bookName):
                 _hadithTO = HadithTO(
                     0, _matn, _matnEmbedding, "Authentic", _bookName, _cleanedMatn
                 )
-                _hadithResult = self.__dalFascade.insertHadith(projectName, _hadithTO)
+                _hadithResult = self.__dalFascade.insertHadith(_hadithTO)
                 if _hadithResult:
                     if _sanad != "No SANAD":
                         sanadTO = SanadTO(_sanad, "Authentic", _hadithTO)
                         _resultSanad = self.__dalFascade.insertSanad(
-                            projectName, sanadTO
+                             sanadTO
                         )
 
                     if _resultSanad:

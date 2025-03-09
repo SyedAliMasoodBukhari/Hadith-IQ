@@ -6,7 +6,7 @@ from TO.SanadTO import SanadTO
 
 class AbsSanadDAO(ABC):
     @abstractmethod
-    def insertSanad(self, projectName: str, sanadTO: SanadTO) -> bool:
+    def insertSanad(self, sanadTO: SanadTO) -> bool:
         pass
 
     @abstractmethod

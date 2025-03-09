@@ -64,10 +64,8 @@ def project_router(fascade: AbsBLLFascade):
     @router.post("/saveProjectState")
     async def saveProjectState(request: SaveProjectStateRequest):
             try:
-                print("mai idhr hunnn")
                 success = fascade.saveProjectState(request.projectName,request.stateData,request.stateQuery)
                 if success:
-                    print("here2")
                     return {"message": "Project State saved successfully!"}
                 else:
                     return {"message": "Project State saving is unsuccessful!", "success": False}
@@ -75,16 +73,19 @@ def project_router(fascade: AbsBLLFascade):
                 raise HTTPException(status_code=500, detail=str(e))
             
 
-    @router.get("/getProjectState", response_model=List[GetProjectStateResponse])
+    @router.get("/getProjectState", response_model=GetProjectStateResponse)
     async def getProjectState(request:GetProjectStateRequest):
         try:
             projectState = fascade.getProjectState(request.projectName)
             if not projectState:
-                return []
-            
-            response = [GetProjectStateResponse(
+                response = GetProjectStateResponse(
               stateQuery=projectState
-            )]
+            )
+                return response
+            
+            response = GetProjectStateResponse(
+              stateQuery=projectState
+            )
             
             return response
         except Exception as e:
@@ -92,26 +93,26 @@ def project_router(fascade: AbsBLLFascade):
 
 
 
-
-
-    @router.get("/getSingleProjectState", response_model=List[GetSingleProjectStateResponse])
+    @router.get("/getSingleProjectState", response_model=GetSingleProjectStateResponse)
     async def getSingleProjectState(request: GetSingleProjectStateRequest):
         try:
             projectState = fascade.getSingleProjectState(request.projectName, request.stateQuery)
             if not projectState:
-                return []
-            response = [
-                GetSingleProjectStateResponse(
-                    stateData=projectState,  # Include matn for each hadith_id
-                    query=request.stateQuery      # Include the query
+                return GetSingleProjectStateResponse(
+                    stateData=[],
+                    query=request.stateQuery 
                 )
-            ]
+            response = GetSingleProjectStateResponse(
+                    stateData=projectState,
+                    query=request.stateQuery 
+                )
+            
             return response
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
             
-    @router.post("/mergeProjectState",response_model=List[MergeProjectStateResponse])
+    @router.put("/mergeProjectState",response_model=MergeProjectStateResponse)
     async def mergeProjectState(request: MergeProjectStateRequest):
         try:
             success = fascade.mergeProjectState(
@@ -120,15 +121,15 @@ def project_router(fascade: AbsBLLFascade):
                 request.queryName
             )
             if success:
-                response=[ MergeProjectStateResponse(message="Project states merged successfully!",success=True)]
+                response= MergeProjectStateResponse(message="Project states merged successfully!",success=True)
                 return response
             else:
-                response=[MergeProjectStateResponse(message="Project states merged unsuccessful!",success=False)]
+                response=MergeProjectStateResponse(message="Project states merged unsuccessful!",success=False)
                 return response
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
-    @router.post("/renameProjectState",response_model=List[RenameProjectStateResponse])
+    @router.put("/renameProjectState",response_model=RenameProjectStateResponse)
     async def renameProjectState(request: RenameProjectStateRequest):
         try:
             success = fascade.renameQueryOfState(
@@ -137,15 +138,15 @@ def project_router(fascade: AbsBLLFascade):
                 request.newQueryName
             )
             if success:
-                response=[ RenameProjectStateResponse(message="Project State Renamed successfully!",success=True)]
+                response=RenameProjectStateResponse(message="Project State Renamed successfully!",success=True)
                 return response
             else:
-                response=[RenameProjectStateResponse(message="Project State Rename unsuccessful!",success=False)]
+                response=RenameProjectStateResponse(message="Project State Rename unsuccessful!",success=False)
                 return response
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
     
-    @router.post("/deleteProjectState",response_model=List[DeleteProjectStateResponse])
+    @router.delete("/deleteProjectState",response_model=DeleteProjectStateResponse)
     async def deleteProjectState(request: DeleteProjectStateRequest):
         try:
             success = fascade.deleteState(
@@ -153,15 +154,15 @@ def project_router(fascade: AbsBLLFascade):
                 request.queryName
             )
             if success:
-                response=[ DeleteProjectStateResponse(message="Project State Deleted successfully!",success=True)]
+                response=DeleteProjectStateResponse(message="Project State Deleted successfully!",success=True)
                 return response
             else:
-                response=[DeleteProjectStateResponse(message="Project State Deletion unsuccessful!",success=False)]
+                response=DeleteProjectStateResponse(message="Project State Deletion unsuccessful!",success=False)
                 return response
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         
-    @router.post("/removeHadithFromState", response_model=RemoveHadithResponse)
+    @router.put("/removeHadithFromState", response_model=RemoveHadithResponse)
     async def removeHadithFromStateQuery(request: RemoveHadithRequest):
         try:
             success = fascade.removeHadithFromState(request.matn, request.projectName, request.stateQuery)

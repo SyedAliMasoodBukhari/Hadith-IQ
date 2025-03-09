@@ -38,6 +38,9 @@ class AbsBLLFascade(ABC):
    def getProjectState(self,name:str)->List[str]:
       pass
    @abstractmethod
+   def getAllBooks(self)->List[str]:
+      pass
+   @abstractmethod
    def getSingleProjectState(self,name:str,query:str)->List[str]:
       pass
    @abstractmethod
@@ -55,6 +58,9 @@ class AbsBLLFascade(ABC):
    #AbsHadithBO Functions
    @abstractmethod
    def importHadithFile(self, projectName: str, filePath: str) -> bool:
+      pass
+   @abstractmethod
+   def importHadithFileCSV(self, filePath: str) -> bool:
       pass
     
    @abstractmethod

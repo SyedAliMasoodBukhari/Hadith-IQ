@@ -1,19 +1,18 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="FYP",
+    name="HadithIQ",
     version="1.0",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        "mysql-connector-python",
-        "sentence-transformers",
         "numpy",
         "fastapi",
         "uvicorn",
         "sqlalchemy",
         "camel-tools",
         "camel_data download --install -f all" # can be done pip install camel-tools -f https://download.pytorch.org/whl/torch_stable.html
-        # to download morphology data base for lammatisation 
+        # to download morphology data base for lammatisation
+        "psycopg2",
     ],
 )

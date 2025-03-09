@@ -18,9 +18,11 @@ class SortResultRequest(BaseModel):
     sortByAuthenticity: bool
     authenticityType: str
 
-class FilePathRequest(BaseModel):
+class ImportBookRequest(BaseModel):
     projectName: str
     filePath: str
+class FilePathRequest(BaseModel):
+    filePath:str
 class GetAllProjectHadithsRequest(BaseModel):
     projectName:str
     page:int

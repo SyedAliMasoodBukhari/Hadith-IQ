@@ -4,7 +4,7 @@ from TO.HadithTO import HadithTO
 class AbsHadithDAO(ABC):
 
     @abstractmethod
-    def insertHadith(self, projectName: str, hadithTO: HadithTO) -> bool:
+    def insertHadith(self, hadithTO: HadithTO) -> bool:
         pass
 
     @abstractmethod

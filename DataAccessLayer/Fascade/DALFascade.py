@@ -53,22 +53,24 @@ class DALFascade(AbsDALFascade):
     
     #AbsBook Functions
 
-    def insertBook(self,projectName:str,bookName:str)->bool:
-        return self.__bookDAO.insertBook(projectName,bookName)
+    def insertBook(self,bookName:str)->bool:
+        return self.__bookDAO.insertBook(bookName)
 
     def deleteBook(self,bookName:str)->bool:
         return self.__bookDAO.deleteBook(bookName)
     
-    def importBook(self, projectName: str, filePath: str) -> List[Dict[str, str]]:
-        return self.__bookDAO.importBook(projectName, filePath)
+    def importBook(self, filePath: str) -> List[Dict[str, str]]:
+        return self.__bookDAO.importBook(filePath)
     
     def associate_book_with_project(self, book_name: str, project_name: str):
         return self.__bookDAO.associate_book_with_project(book_name,project_name)
+    def getAllBooks(self)->List[str]:
+        return self.__bookDAO.getAllBooks()
     
     #AbsHadith Functions
     
-    def insertHadith(self, projectName: str, hadithTO: HadithTO) -> bool:
-        return self.__hadithDAO.insertHadith(projectName, hadithTO)
+    def insertHadith(self, hadithTO: HadithTO) -> bool:
+        return self.__hadithDAO.insertHadith(hadithTO)
 
     def getHadithDetails(self,hadithTO:HadithTO)->dict:
         return self.__hadithDAO._getHadithDetails(hadithTO)
@@ -82,13 +84,12 @@ class DALFascade(AbsDALFascade):
     def associate_hadiths_with_project(self, book_name: str, projectName: str):
         return self.__hadithDAO.associate_hadiths_with_project(book_name,projectName)
     def getAllHadithsOfProject(self, projectName: str,page:int) -> dict:
-        print("in dal fascade")
         return self.__hadithDAO.getAllHadithsOfProject(projectName,page)
     
     #AbsSanad Function
     
-    def insertSanad(self, projectName: str, sanadTO: SanadTO) -> bool:
-        return self.__sanadDAO.insertSanad(projectName, sanadTO)
+    def insertSanad(self, sanadTO: SanadTO) -> bool:
+        return self.__sanadDAO.insertSanad( sanadTO)
 
     def getSanad(self,matn:str)->List[SanadTO]:
         return self.__sanadDAO.getSanad(matn)

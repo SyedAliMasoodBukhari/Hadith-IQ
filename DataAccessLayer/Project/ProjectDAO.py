@@ -19,7 +19,7 @@ class ProjectDAO(AbsProjectDAO):
 
     def createProject(self, name: str, creationDate: str) -> bool:
         try:
-            newProject = Project(ProjectName=name)
+            newProject = Project(projectname=name)
 
             session: Session = self.__dbConnection.getSession()
             session.add(newProject)
@@ -71,10 +71,10 @@ class ProjectDAO(AbsProjectDAO):
             results = session.query(Project).all()
             for project in results:
                 projectTO = ProjectTO(
-                    project.ProjectID,
-                    project.ProjectName,
-                    project.LastUpdated.strftime("%d-%m-%Y") if project.LastUpdated else None,
-                    project.CreatedAt.strftime("%d-%m-%Y") if project.CreatedAt else None,
+                    project.projectid,
+                    project.projectname,
+                    project.lastupdated.strftime("%d-%m-%Y") if project.lastupdated else None,
+                    project.createdat.strftime("%d-%m-%Y") if project.createdat else None,
                 )
                 projects.append(projectTO)
             return projects
@@ -118,8 +118,6 @@ class ProjectDAO(AbsProjectDAO):
 
             session: Session = self.__dbConnection.getSession()
             hadith_ids = []
-
-            # Retrieve Hadith IDs
             for matn in stateData:
                 hadith_id = self.__util.getHadithId(matn)
                 if hadith_id != -1:
@@ -127,10 +125,7 @@ class ProjectDAO(AbsProjectDAO):
                 else:
                     print(f"Hadith with matn '{matn}' not found.")
 
-            # Convert Hadith IDs to a comma-separated string
             new_state_str = ",".join(map(str, hadith_ids))
-
-            # Query the existing state entry
             state_entry = session.query(ProjectState).filter(
                 ProjectState.projectid == projectId,
                 ProjectState.query == query
@@ -152,7 +147,6 @@ class ProjectDAO(AbsProjectDAO):
                     synchronize_session='fetch'
                 )
             else:
-                # Create a new state entry
                 new_state = ProjectState(
                     projectid=projectId,
                     query=query,
@@ -160,7 +154,6 @@ class ProjectDAO(AbsProjectDAO):
                 )
                 session.add(new_state)
 
-            # Update project's lastupdated timestamp
             project_entry = session.query(Project).filter_by(projectid=projectId).first()
             if project_entry:
                 project_entry.lastupdated = datetime.now(timezone.utc)
@@ -177,6 +170,7 @@ class ProjectDAO(AbsProjectDAO):
         finally:
             if session:
                 session.close()
+
 
 
 
@@ -208,49 +202,9 @@ class ProjectDAO(AbsProjectDAO):
             if session:
                 session.close()
 
-
-    
-
-    def get_matn_for_hadith_ids(self,hadith_ids: List[str], session) -> Dict[str, str]:
-        matn_dict = {}
-        for hadith_id in hadith_ids:
-            hadith = session.query(Hadith).filter(Hadith.hadithid == hadith_id).first()
-            if hadith:
-                matn_dict[hadith_id] = hadith.matn
-        return matn_dict
-
-
     def clean_hadith_id(self,hadith_id: str) -> str:
-        """
-        Cleans the hadith_id by removing extra quotes and invalid characters.
-        """
-        # Remove any non-digit characters
         cleaned_id = re.sub(r"[^\d]", "", hadith_id)
         return cleaned_id
-
-
-    def parse_statedata(self,statedata: str) -> Set[str]:
-        """
-        Extracts unique hadith_ids from the statedata string.
-        """
-        unique_hadith_ids = set()
-        # Use regex to split the string by commas that are outside of query:hadith_ids pairs
-        entries = re.split(r",(?=\w+:\d)", statedata)
-
-        for entry in entries:
-            if ":" in entry:
-                # Split into query and hadith_ids
-                _, hadith_ids_str = entry.split(":", 1)
-                # Split hadith_ids into a list and clean each hadith_id
-                hadith_ids = [self.clean_hadith_id(hid) for hid in hadith_ids_str.split(",")]
-                unique_hadith_ids.update(hadith_ids)
-            else:
-                # Handle cases where the entry is just a hadith_id (no query)
-                if re.match(r"^\d+$", entry):
-                    cleaned_id = self.clean_hadith_id(entry)
-                    unique_hadith_ids.add(cleaned_id)
-
-        return unique_hadith_ids
 
 
     def getSingleProjectState(self, projectName: str, query_names: str) -> List[str]:
@@ -261,7 +215,6 @@ class ProjectDAO(AbsProjectDAO):
 
         session: Session = self.__dbConnection.getSession()
         try:
-            # Fetch the state for the given query
             state = session.query(ProjectState).filter(
                 ProjectState.projectid == project_id,
                 ProjectState.query == query_names
@@ -302,8 +255,10 @@ class ProjectDAO(AbsProjectDAO):
             if existing_state:
                 print(f"Error: Query name '{queryname}' already exists in the database.")
                 return False
+            session.close()
             merged_hadith_ids = set() 
             for query in query_names:
+                session: Session = self.__dbConnection.getSession()
                 state = session.query(ProjectState).filter(
                     ProjectState.projectid == projectId,
                     ProjectState.query == query
@@ -311,28 +266,38 @@ class ProjectDAO(AbsProjectDAO):
 
                 if state and state.statedata:
                     cleaned_data = state.statedata.strip('"')
+                    print(f"Cleaned data for query '{query}': {cleaned_data}")
                     hadith_ids = cleaned_data.split(",") if cleaned_data else []
+                    print(f"Hadith IDs for query '{query}': {hadith_ids}")
                     for hadith_id in hadith_ids:
-                        if hadith_id.strip().isdigit():
-                            merged_hadith_ids.add(hadith_id.strip())
-
+                        stripped_id = hadith_id.strip()
+                        if stripped_id.isdigit():
+                            merged_hadith_ids.add(stripped_id)
+                        else:
+                            print(f"Invalid hadith_id '{hadith_id}' in query '{query}'")
+                else:
+                    print(f"No state data found for query '{query}'")
+                session.close()
             if not merged_hadith_ids:
                 print(f"No valid state data found for queries '{', '.join(query_names)}'.")
                 return False
-            new_state_data_str = ",".join(sorted(merged_hadith_ids))  
+
+            new_state_data_str = ",".join(sorted(merged_hadith_ids, key=int))  
             print(f"Merged state data: {new_state_data_str}")
+
             new_state = ProjectState(
                 projectid=projectId,
                 query=queryname,
                 statedata=new_state_data_str
             )
             session.add(new_state)
+
             project_entry = session.query(Project).filter_by(projectid=projectId).first()
             if project_entry:
                 project_entry.lastupdated = datetime.now(timezone.utc)
 
             session.commit()
-            print(f"Merged state saved as '{queryname}', and old states for '{', '.join(query_names)}' deleted.")
+            print(f"Merged state saved as '{queryname}'.")
             return True
 
         except SQLAlchemyError as e:
@@ -342,7 +307,7 @@ class ProjectDAO(AbsProjectDAO):
             return False
         finally:
             if session:
-                session.close()
+             session.close()
 
 
     
@@ -441,8 +406,7 @@ class ProjectDAO(AbsProjectDAO):
             if not existing_state:
                 print(f"No state found for project ID '{project_id}' and query '{stateQuery}'.")
                 return False
-
-            existing_state_query = existing_state.statedata  # Direct string handling
+            existing_state_query = existing_state.statedata
             updated_state_query = existing_state_query
 
             for matn in matn_list:
@@ -462,11 +426,17 @@ class ProjectDAO(AbsProjectDAO):
                 ProjectState.projectid == project_id,
                 ProjectState.query == stateQuery
             ).update(
-                {"statedata": updated_state_query},  # Direct string update
+                {"statedata": updated_state_query},
                 synchronize_session='fetch'
             )
             session.commit()
             print("State updated successfully.")
+            project_entry = session.query(Project).filter_by(projectid=project_id).first()
+            if project_entry:
+                project_entry.lastupdated = datetime.now(timezone.utc)
+
+            session.commit()
+            print("Project state saved successfully, and LastUpdated time updated.")
             return True
 
         except SQLAlchemyError as e:

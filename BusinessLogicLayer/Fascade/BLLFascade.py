@@ -3,6 +3,7 @@ from BusinessLogicLayer.Hadith.AbsHadithBO import AbsHadithBO
 from BusinessLogicLayer.Narrator.AbsNarratorBO import AbsNarratorBO
 from BusinessLogicLayer.Sanad.AbsSanadBO import AbsSanadBO
 from BusinessLogicLayer.Project.AbsProjectBO import AbsProjectBO
+from BusinessLogicLayer.Book.AbsBookBO import AbsBookBO
 from TO.SanadTO import SanadTO
 from TO.HadithTO import HadithTO
 from TO.ProjectTO import ProjectTO
@@ -18,11 +19,13 @@ class BLLFascade(AbsBLLFascade):
         sanadBO: AbsSanadBO,
         projectBO: AbsProjectBO,
         narratorBO: AbsNarratorBO,
+        bookBO:AbsBookBO,
     ):
         self.__hadithBO = hadithBO
         self.__narratorBO = narratorBO
         self.__projectBO = projectBO
         self.__sanadBO = sanadBO
+        self.__bookBO=bookBO
 
     # projectBo functions
 
@@ -62,6 +65,11 @@ class BLLFascade(AbsBLLFascade):
 
     def importHadithFile(self, projectName: str, filePath: str) -> bool:
         return self.__hadithBO.importHadithFile(projectName, filePath)
+    
+    def importHadithFileCSV(self, filePath: str) -> bool:
+        return self.__hadithBO.importHadithFileCSV(filePath)
+    def getAllBooks(self):
+        return self.__bookBO.getAllBooks()
 
     def getAllHadith(self) -> List[HadithTO]:
         return self.__hadithBO.getAllHadith()
@@ -73,7 +81,6 @@ class BLLFascade(AbsBLLFascade):
         return self.__hadithBO.getHadithData(HadithTO)
     
     def getAllHadithsOfProject(self, projectName: str,page:int) -> dict:
-        print("bll fascade")
         return self.__hadithBO.getAllHadithsOfProject(projectName,page)
 
     def sortHadith(

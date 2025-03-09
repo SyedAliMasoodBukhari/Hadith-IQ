@@ -13,7 +13,7 @@ class HadithDAO(AbsHadithDAO):
         self.__dbConnection = dbConnection
         self.__util=util
 
-    def insertHadith(self, projectName: str, hadithTO: HadithTO) -> bool:
+    def insertHadith(self, hadithTO: HadithTO) -> bool:
         try:
             session: Session = self.__dbConnection.getSession()
 
@@ -29,7 +29,7 @@ class HadithDAO(AbsHadithDAO):
 
             if hadith.hadithid:
                 print(f"Hadith inserted successfully: {hadithTO.matn}")
-                return self._insertHadithIntoJunction(session, projectName, hadithTO)
+                return self._insertHadithIntoJunction(session, hadithTO)
             else:
                 return False
         except SQLAlchemyError as e:
@@ -69,8 +69,6 @@ class HadithDAO(AbsHadithDAO):
             if not first_level_narrators:
                 print(f"No Level 1 Narrators found for Sanad: {sanad_record.sanad}")
                 return ""
-
-            # Assuming there is one narrator with Level 1, return their name
             narrator = first_level_narrators[0]
             return narrator.narratorname
 
@@ -141,23 +139,16 @@ class HadithDAO(AbsHadithDAO):
     #         return -1
         
 
-    def _insertHadithIntoJunction(self, session: Session, projectName: str, hadithTO: HadithTO) -> bool:
+    def _insertHadithIntoJunction(self, session: Session, hadithTO: HadithTO) -> bool:
         try:
-            book = session.query(Book).filter_by(bokname=hadithTO.bookName).first()
+            book = session.query(Book).filter_by(bookname=hadithTO.bookName).first()
             hadith = session.query(Hadith).filter_by(matn=hadithTO.matn).first()
-            project = session.query(Project).filter_by(projectname=projectName).first()
 
-            if not book or not hadith or not project:
-                print(f"Book, Hadith or Project not found")
+            if not book or not hadith :
+                print(f"Book, Hadith not found")
                 return False
-
-            # Associate Hadith with the Book
             if book not in hadith.books:
                 hadith.books.append(book)
-
-            # Associate Hadith with the Project
-            if hadith not in project.hadiths:
-                project.hadiths.append(hadith)
 
             session.commit()
             print(f"Hadith successfully associated.")

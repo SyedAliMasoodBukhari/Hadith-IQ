@@ -32,7 +32,6 @@ class ProjectBO(AbsProjectBO):
     def getProjects(self) -> List[ProjectTO]:
         try:
             projects = self.dalFascade.getProjects()
-            print("here")
             return projects
         except Exception as e:
             print(f"Error fetching projects: {e}")

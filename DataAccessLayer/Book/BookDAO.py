@@ -13,28 +13,17 @@ class BookDAO(AbsBookDAO):
         self.__dbConnection = dbConnection
         self.__util = util
 
-    def insertBook(self, projectName: str, bookName: str) -> bool:
+    def insertBook(self, bookName: str) -> bool:
         try:
             session: Session = self.__dbConnection.getSession()
-
-            project = session.query(Project).filter_by(projectname=projectName).first()
-            if not project:
-                print(f"Project '{projectName}' does not exist.")
-                return False
-            
             book = session.query(Book).filter_by(bookname=bookName).first()
             if not book:
                 book = Book(bookname=bookName)
                 session.add(book)
                 session.commit()
 
-            if book in project.books: 
-                print(f"Book '{bookName}' is already linked to project '{projectName}'.")
-                return True
-
-            project.books.append(book)
             session.commit()
-            print(f"Book '{bookName}' added successfully to project '{projectName}'.")
+            print(f"Book '{bookName}' added successfully.")
             return True
 
         except SQLAlchemyError as e:
@@ -54,8 +43,42 @@ class BookDAO(AbsBookDAO):
 
     def deleteBook(self, bookName: str) -> bool:
         return False
+    
+    def importBook(self,filePath: str) -> List[Dict[str, str]]:
+        try:
+            dataFrame = pd.read_csv(filePath)
+            
+            result_data = []
 
-    def importBook(self, projectName: str, filePath: str) -> List[Dict[str, str]]:
+            if not dataFrame.isnull().values.any():
+                for index, row in dataFrame.iterrows():
+                        _book = row["Book"]
+
+                        # Only process rows where "Book" is not empty
+                        if _book is not None and _book != "":
+                            _sanad = row["Sanad"]
+                            _matn = row["Matn"]
+
+                            sanad_dict = {
+                                "matn": _matn,
+                                "bookname": _book,
+                                "sanad": _sanad
+                            }
+
+                            result_data.append(sanad_dict)
+
+                return result_data
+
+            return []
+
+        except Exception as e:
+            print("Exception", e)
+            return []
+
+    
+
+
+    def importBookdsdksm(self, projectName: str, filePath: str) -> List[Dict[str, str]]:
         try:
             dataFrame = pd.read_csv(filePath)
             
@@ -112,3 +135,17 @@ class BookDAO(AbsBookDAO):
                 session.rollback()
                 print(f"Error: {e}")
                 return False
+    
+    def getAllBooks(self)->List[str]:
+        try:
+            books = []
+            session: Session = self.__dbConnection.getSession()
+            results = session.query(Book).all()
+            for book in results:
+                books.append(book.bookname)
+            return books
+        except Exception as e:
+            print(f"Error in get books: {e}")
+            return []
+        finally:
+            session.close()

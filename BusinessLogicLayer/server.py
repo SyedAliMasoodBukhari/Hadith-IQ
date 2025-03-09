@@ -6,6 +6,7 @@ from BusinessLogicLayer.Project.ProjectBO import ProjectBO
 from BusinessLogicLayer.Sanad.SanadBO import SanadBO
 from BusinessLogicLayer.api.HadithApi import hadith_router
 from BusinessLogicLayer.api.ProjectApi import project_router
+from BusinessLogicLayer.api.BookApi import book_router
 from BusinessLogicLayer.api.NarratorApi import narrator_router
 from DataAccessLayer.Book.BookDAO import BookDAO
 from DataAccessLayer.Fascade.DALFascade import DALFascade
@@ -15,6 +16,8 @@ from DataAccessLayer.Narrator.NarratorDAO import NarratorDAO
 from DataAccessLayer.Project.ProjectDAO import ProjectDAO
 from DataAccessLayer.Sanad.SanadDAO import SanadDAO
 from DataAccessLayer.UtilDAO import UtilDao
+from DataAccessLayer.Book.BookDAO import BookDAO
+from BusinessLogicLayer.Book.BookBO import BookBO
 
 
 #Initiallizing DAL
@@ -32,7 +35,8 @@ hadithBO= HadithBO(dalFascade)
 narratorBO= NarratorBO(dalFascade)
 projectBO= ProjectBO(dalFascade)
 sanadBO= SanadBO(dalFascade)
-bllFascade= BLLFascade(hadithBO,sanadBO,projectBO,narratorBO)
+bookBO=BookBO(dalFascade)
+bllFascade= BLLFascade(hadithBO,sanadBO,projectBO,narratorBO,bookBO)
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -45,6 +49,7 @@ app = FastAPI(
 app.include_router(hadith_router(bllFascade), prefix="/api/hadith")
 app.include_router(project_router(bllFascade), prefix="/api/project")
 app.include_router(narrator_router(bllFascade),prefix="/api/narrator")
+app.include_router(book_router(bllFascade),prefix="/api/book")
 
 if __name__ == "__main__":
     import uvicorn

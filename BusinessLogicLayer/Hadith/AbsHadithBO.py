@@ -34,3 +34,7 @@ class AbsHadithBO(ABC):
     @abstractmethod
     def getAllHadithsOfProject(self, projectName: str,page:int) -> dict:
        pass
+    @abstractmethod
+    
+    def importHadithFileCSV(self, filePath: str) -> bool:
+        pass

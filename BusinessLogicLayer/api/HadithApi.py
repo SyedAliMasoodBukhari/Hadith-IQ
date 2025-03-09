@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from BusinessLogicLayer.Fascade.AbsBLLFascade import AbsBLLFascade
-from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest
+from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest,ImportBookRequest
 from BusinessLogicLayer.api.PydanticModel.HadithResponse import ExpandSearchResponse, ExpandSearchResult, SemanticSearchResponse,SortResultResponse,GetAllProjectHadithsResponse
 from BusinessLogicLayer.api.PydanticModel.HadithResponse import SemanticSearchResult ,SortResultResult
 
@@ -9,10 +9,22 @@ def hadith_router(fascade: AbsBLLFascade):
     router = APIRouter()
 
     @router.post("/importHadithFile")
-    async def import_hadith(request: FilePathRequest):
+    async def import_hadith(request: ImportBookRequest):
         try:
             # Call the function from your BLL
-            success = fascade.importHadithFile(request.projectName, request.filePath)
+            success = fascade.importHadithFile(request.filePath)
+            if success:
+                return {"message": "File imported successfully!"}
+            else:
+                return {"message": "File import failed.", "success": False}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    @router.post("/importHadithFileCSV")
+    async def import_hadith_csv(request: FilePathRequest):
+        try:
+            # Call the function from your BLL
+            success = fascade.importHadithFileCSV(request.filePath)
             if success:
                 return {"message": "File imported successfully!"}
             else:

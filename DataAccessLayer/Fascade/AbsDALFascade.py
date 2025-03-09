@@ -52,11 +52,14 @@ class AbsDALFascade(ABC):
     
 
     @abstractmethod
-    def insertBook(self,projectName:str,bookName:str)->bool:
+    def insertBook(self,bookName:str)->bool:
         pass
 
     @abstractmethod
     def deleteBook(self,bookName:str)->bool:
+        pass
+    @abstractmethod
+    def getAllBooks(self)->List[str]:
         pass
 
     @abstractmethod
@@ -66,13 +69,12 @@ class AbsDALFascade(ABC):
     @abstractmethod
     def getHadithFirstNarrator(self, hadith:str) -> str:
         pass
-
     @abstractmethod
-    def importBook(self, projectName: str, filePath: str) -> List[Dict[str, str]]:
+    def importBook(self, filePath: str) -> List[Dict[str, str]]:
         pass
 
     @abstractmethod
-    def insertHadith(self, projectName: str, hadithTO: HadithTO) -> bool:
+    def insertHadith(self, hadithTO: HadithTO) -> bool:
         pass
     
     @abstractmethod
@@ -91,7 +93,7 @@ class AbsDALFascade(ABC):
         pass
 
     @abstractmethod
-    def insertSanad(self, projectName: str, sanadTO: SanadTO) -> bool:
+    def insertSanad(self, sanadTO: SanadTO) -> bool:
         pass
     
     @abstractmethod
