@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from BusinessLogicLayer.Fascade.AbsBLLFascade import AbsBLLFascade
-from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest,ImportBookRequest,GetHadithDetails
+from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest,ImportBookRequest,GetHadithDetails,GetListOfHadithDetails
 from BusinessLogicLayer.api.PydanticModel.HadithResponse import ExpandSearchResponse, ExpandSearchResult, SemanticSearchResponse,SortResultResponse,GetAllProjectHadithsResponse,HadithDetailsResponse
 from BusinessLogicLayer.api.PydanticModel.HadithResponse import SemanticSearchResult ,SortResultResult
 
@@ -112,6 +112,25 @@ def hadith_router(fascade: AbsBLLFascade):
             sanads=hadith["sanads"],
             books=hadith["books"]
         )
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        
+    @router.post("/getListOfHadithsDetails", response_model=List[HadithDetailsResponse])
+    async def get_list_of_hadith_details(requests: GetListOfHadithDetails):
+        try:
+            hadiths_list = []
+            for requestMatn in requests.matn:
+                hadith = fascade.getHadithDetails(requestMatn)
+                if hadith:
+                    hadiths_list.append(
+                        HadithDetailsResponse(
+                            matn=hadith["matn"],
+                            sanads=hadith["sanads"],
+                            books=hadith["books"]
+                        )
+                    )
+            return hadiths_list
 
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))

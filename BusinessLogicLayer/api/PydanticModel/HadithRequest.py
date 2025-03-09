@@ -28,3 +28,5 @@ class GetAllProjectHadithsRequest(BaseModel):
     page:int
 class GetHadithDetails(BaseModel):
     matn:str
+class GetListOfHadithDetails(BaseModel):
+    matn:List[str]
