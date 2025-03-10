@@ -2,21 +2,21 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from BusinessLogicLayer.Fascade.AbsBLLFascade import AbsBLLFascade
 from BusinessLogicLayer.api.PydanticModel.HadithRequest import ExpandSearchRequest, FilePathRequest, SemanticSearchRequest,SortResultRequest,GetAllProjectHadithsRequest,ImportBookRequest,GetHadithDetails,GetListOfHadithDetails
-from BusinessLogicLayer.api.PydanticModel.HadithResponse import ExpandSearchResponse, ExpandSearchResult, SemanticSearchResponse,SortResultResponse,GetAllProjectHadithsResponse,HadithDetailsResponse
+from BusinessLogicLayer.api.PydanticModel.HadithResponse import ExpandSearchResponse, ExpandSearchResult, SemanticSearchResponse,SortResultResponse,GetAllProjectHadithsResponse,HadithDetailsResponse,SearchByNarratorResponse
 from BusinessLogicLayer.api.PydanticModel.HadithResponse import SemanticSearchResult ,SortResultResult
 
 def hadith_router(fascade: AbsBLLFascade):
     router = APIRouter()
 
-    @router.post("/importHadithFile")
-    async def import_hadith(request: ImportBookRequest):
+    @router.post("/importBook")
+    async def import_book(request: ImportBookRequest):
         try:
             # Call the function from your BLL
             success = fascade.importHadithFile(projectName=request.projectName,filePath=request.filePath)
             if success:
-                return {"message": "File imported successfully!"}
+                return {"message": "Book imported successfully!","success":True}
             else:
-                return {"message": "File import failed.", "success": False}
+                return {"message": "Book import failed.", "success": False}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
     
@@ -26,7 +26,7 @@ def hadith_router(fascade: AbsBLLFascade):
             # Call the function from your BLL
             success = fascade.importHadithFileCSV(request.filePath)
             if success:
-                return {"message": "File imported successfully!"}
+                return {"message": "File imported successfully!","success":True}
             else:
                 return {"message": "File import failed. Please check the data.", "success": False}
         except Exception as e:
@@ -97,13 +97,22 @@ def hadith_router(fascade: AbsBLLFascade):
             return[ GetAllProjectHadithsResponse(results=hadith["results"],  
             totalPages=hadith["total_pages"],
             currentpage=hadith["current_page"],)]
-
-
             
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
+    @router.get("/getAllHadiths",response_model=List[GetAllProjectHadithsResponse])
+    async def get_all_hadiths(page:int):
+        try:
+
+            hadith=fascade.getAllHadiths(page)
+            return[ GetAllProjectHadithsResponse(results=hadith["results"],  
+            totalPages=hadith["total_pages"],
+            currentpage=hadith["current_page"],)]
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
         
-    @router.post("/getHadithsDetails",response_model=HadithDetailsResponse)
+    @router.post("/getHadithDetails",response_model=HadithDetailsResponse)
     async def get_hadith_details(request:GetHadithDetails ):
         try:
             hadith=fascade.getHadithDetails(request.matn)
@@ -132,6 +141,18 @@ def hadith_router(fascade: AbsBLLFascade):
                     )
             return hadiths_list
 
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        
+    @router.get("/searchHadithsByNarrator", response_model=SearchByNarratorResponse)
+    async def searchHadithsByNarrator(project_name:str,narrator_name:str,page:int):
+        try:
+            hadith=fascade.searchHadithByNarrator(project_name,narrator_name,page)
+            return SearchByNarratorResponse(results=hadith["results"],  
+            totalPages=hadith["total_pages"],
+            currentpage=hadith["current_page"],)
+
+            
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 

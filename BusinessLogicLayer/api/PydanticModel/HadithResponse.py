@@ -31,6 +31,10 @@ class GetAllProjectHadithsResponse(BaseModel):
     results: List[dict]
     totalPages:int
     currentpage:int
+class SearchByNarratorResponse(BaseModel):
+    results: List[str]
+    totalPages:int
+    currentpage:int
 
 class NarratorDetails(BaseModel):
     narrator_name: str

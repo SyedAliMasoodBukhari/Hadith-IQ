@@ -14,5 +14,6 @@ setup(
         "camel_data download --install -f all" # can be done pip install camel-tools -f https://download.pytorch.org/whl/torch_stable.html
         # to download morphology data base for lammatisation
         "psycopg2",
+        "html2text"
     ],
 )

@@ -8,7 +8,7 @@ class AbsHadithBO(ABC):
         pass
     
     @abstractmethod
-    def getAllHadith(self)->List[HadithTO]:
+    def getAllHadiths(self, page: int) -> dict:
         pass
     
     @abstractmethod
@@ -40,4 +40,7 @@ class AbsHadithBO(ABC):
         pass
     @abstractmethod
     def getHadithDetails(self, matn: str) -> dict:
+        pass
+    @abstractmethod
+    def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
         pass

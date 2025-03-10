@@ -108,7 +108,7 @@ class ProjectDAO(AbsProjectDAO):
 
 ##################################################################ProjectState
 
-    def saveProjectState(self, projectName: str, stateData: list, query: str) -> bool:
+    def saveProjectStatewqwqqwwwqwqw(self, projectName: str, stateData: list, query: str) -> bool:
         session = None
         try:
             projectId = self.__util.getProjectId(projectName)
@@ -153,6 +153,80 @@ class ProjectDAO(AbsProjectDAO):
                     statedata=new_state_str
                 )
                 session.add(new_state)
+
+            project_entry = session.query(Project).filter_by(projectid=projectId).first()
+            if project_entry:
+                project_entry.lastupdated = datetime.now(timezone.utc)
+
+            session.commit()
+            print("Project state saved successfully, and LastUpdated time updated.")
+            return True
+
+        except SQLAlchemyError as e:
+            if session:
+                session.rollback()
+            print(f"Error saving project state: {e}")
+            return False
+        finally:
+            if session:
+                session.close()
+
+    def saveProjectState(self, projectName: str, stateData: list, query: str) -> bool:
+        session = None
+        try:
+            projectId = self.__util.getProjectId(projectName)
+            if projectId == -1:
+                print(f"Project with name '{projectName}' not found.")
+                return False
+
+            session: Session = self.__dbConnection.getSession()
+            hadith_ids = []
+            for matn in stateData:
+                hadith_id = self.__util.getHadithId(matn)
+                if hadith_id != -1:
+                    hadith_ids.append(hadith_id)
+                else:
+                    print(f"Hadith with matn '{matn}' not found.")
+
+            new_state_str = ",".join(map(str, hadith_ids))
+            state_entry = session.query(ProjectState).filter(
+            ProjectState.projectid == projectId,
+            ProjectState.query == query
+        ).first()
+
+            if state_entry:
+                stored_data = state_entry.statedata.strip('"') if isinstance(state_entry.statedata, str) else ""
+
+                # **NEW CHECK: If `statedata` is empty, delete the existing entry**
+                if stored_data == "":
+                    session.query(ProjectState).filter(
+                        ProjectState.projectid == projectId,
+                        ProjectState.query == query  # Ensure only this query is deleted
+                    ).delete(synchronize_session=False)  
+                    session.commit()  # Ensure deletion before creating a new entry
+                    state_entry = None  # Reset to None to trigger new state creation
+
+            if state_entry is None:
+                # Create a new state entry
+                new_state = ProjectState(
+                    projectid=projectId,
+                    query=query,
+                    statedata=new_state_str
+                )
+                session.add(new_state)
+            else:
+                # Update the existing state entry
+                existing_hadiths = set(map(int, stored_data.split(","))) if stored_data else set()
+                combined_hadiths = sorted(existing_hadiths.union(set(hadith_ids)))
+                updated_state_str = ",".join(map(str, combined_hadiths))
+
+                session.query(ProjectState).filter(
+                    ProjectState.projectid == projectId,
+                    ProjectState.query == query
+                ).update(
+                    {"statedata": updated_state_str},
+                    synchronize_session='fetch'
+                )
 
             project_entry = session.query(Project).filter_by(projectid=projectId).first()
             if project_entry:

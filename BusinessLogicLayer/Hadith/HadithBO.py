@@ -286,8 +286,11 @@ class HadithBO(AbsHadithBO):
     
     # --------------------------------------------------------------------------
 
-    def getAllHadith(self) -> List[HadithTO]:
-        return None
+    
+    def getAllHadiths(self, page: int) -> dict:
+        return self.__dalFascade.getAllHadiths(page)
+    def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
+        return self.__dalFascade.searchHadithByNarrator(project_name,narrator_name,page)
     
     # ---------------------------------Multi processing wala-----------------------------------------
 

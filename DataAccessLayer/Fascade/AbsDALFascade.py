@@ -90,7 +90,12 @@ class AbsDALFascade(ABC):
     @abstractmethod
     def getHadithDetails(self, matn: str) -> dict:
         pass
-    
+    @abstractmethod
+    def getAllHadiths(self, page: int) -> dict:
+        pass
+    @abstractmethod
+    def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
+        pass
     @abstractmethod
     def getProjectHadithsEmbedding(self, projectName:str) -> dict:
         pass
@@ -115,6 +120,7 @@ class AbsDALFascade(ABC):
     @abstractmethod
     def getAllNarrators(self)->List[NarratorTO]:
         pass
+
     
     @abstractmethod
     def getSimilarNarrator(self,NarratorTO:NarratorTO)->List[NarratorTO]:
@@ -129,5 +135,8 @@ class AbsDALFascade(ABC):
         pass
     @abstractmethod
     def getAllNarratorsOfProject(self, project_name: str,page:int) -> dict:
+        pass
+    @abstractmethod
+    def getAllNarrators(self, page: int) -> dict:
         pass
       

@@ -71,8 +71,9 @@ class BLLFascade(AbsBLLFascade):
     def getAllBooks(self):
         return self.__bookBO.getAllBooks()
 
-    def getAllHadith(self) -> List[HadithTO]:
-        return self.__hadithBO.getAllHadith()
+    
+    def getAllHadiths(self, page: int) -> dict:
+        return self.__hadithBO.getAllHadiths(page)
 
     def semanticSearch(self, hadith: str, projectName: str, threshold: float) -> dict:
         return self.__hadithBO.semanticSearch(hadith, projectName, threshold)
@@ -97,6 +98,8 @@ class BLLFascade(AbsBLLFascade):
         return self.__hadithBO.expandSearch(HadithTO, projectName, threshold)
     def getHadithDetails(self, matn: str) -> dict:
         return self.__hadithBO.getHadithDetails(matn)
+    def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
+        return self.__hadithBO.searchHadithByNarrator(project_name,narrator_name,page)
 
     # NarratorBO Functions
     ##
@@ -130,12 +133,20 @@ class BLLFascade(AbsBLLFascade):
     ##
     def getNarratorDetails(self, narratorTO: NarratorTO) -> List[NarratorTO]:
         return self.__narratorBO.getNarratorDetails(narratorTO)
+    def convertHtmlToText(self,html_file: str) -> dict:
+        return self.__narratorBO.convertHtmlToText(html_file)
+    def filter_and_append(self, input_file, arabic_count)->dict:
+        return self.__narratorBO.filter_and_append(input_file,arabic_count)
 
     ##
     def importNarratorOpinions(self, file: str) -> bool:
         return self.__narratorBO.importNarratorOpinions(file)
     def getAllNarratorsOfProject(self, project_name: str,page :int) -> dict:
         return self.__narratorBO.getAllNarratorsOfProject(project_name,page)
+    def fetch_narrator_data(self,file_path:str,arabic_count:str)->dict:
+        return self.__narratorBO.fetch_narrator_data(file_path,arabic_count)
+    def getAllNarrators(self, page: int) -> dict:
+        return self.__narratorBO.getAllNarrators(page)
       
 
     # SanadBO Functions

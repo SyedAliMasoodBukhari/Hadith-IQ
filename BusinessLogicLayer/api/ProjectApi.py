@@ -66,7 +66,7 @@ def project_router(fascade: AbsBLLFascade):
             try:
                 success = fascade.saveProjectState(request.projectName,request.stateData,request.stateQuery)
                 if success:
-                    return {"message": "Project State saved successfully!"}
+                    return {"message": "Project State saved successfully!","success":True}
                 else:
                     return {"message": "Project State saving is unsuccessful!", "success": False}
             except Exception as e:

@@ -243,6 +243,43 @@ class HadithDAO(AbsHadithDAO):
         finally:
             session.close()
     
+    def getAllHadiths(self, page: int) -> dict:
+        try:
+            session: Session = self.__dbConnection.getSession()
+            
+            per_page = 100
+            total_hadiths = session.query(Hadith).count()
+            total_pages = (total_hadiths + per_page - 1) // per_page  
+
+            if page > total_pages:
+                return {
+                    "results": [],
+                    "total_pages": total_pages,
+                    "current_page": page,
+                }
+
+            hadiths = session.query(Hadith).offset((page - 1) * per_page).limit(per_page).all()
+
+            hadiths_list = [{"id": hadith.hadithid, "matn": hadith.matn} for hadith in hadiths]
+
+            return {
+                "results": hadiths_list,
+                "total_pages": total_pages,
+                "current_page": page,
+            }
+
+        except Exception as e:
+            session.rollback()
+            print(f"Error retrieving Hadiths: {e}")
+            return {
+                "results": [],
+                "total_pages": 0,
+                "current_page": page,
+            }
+        finally:
+            session.close()
+
+    
     def getHadithDetails(self, matn:str) -> dict:
         try:
             session: Session = self.__dbConnection.getSession()
@@ -287,3 +324,48 @@ class HadithDAO(AbsHadithDAO):
             return {}
         finally:
             session.close()
+
+    def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
+        session: Session = None
+        try:
+            session = self.__dbConnection.getSession()
+
+            per_page = 100
+            query = (
+                session.query(Hadith)
+                .join(hadith_sanad, hadith_sanad.c.hadithid == Hadith.hadithid)
+                .join(Sanad, Sanad.sanadid == hadith_sanad.c.sanadid)
+                .join(narrator_sanad, narrator_sanad.c.sanadid == Sanad.sanadid)
+                .join(Narrator, Narrator.narratorid == narrator_sanad.c.narratorid)
+                .filter(Narrator.narratorname.like(f"%{narrator_name}%"))
+            )
+
+            total_hadiths = query.count() 
+            total_pages = (total_hadiths + per_page - 1) // per_page
+
+            if page > total_pages:
+                return {
+                    "results": [],
+                    "total_pages": total_pages,
+                    "current_page": page,
+                }
+
+            hadiths = query.offset((page - 1) * per_page).limit(per_page).all()
+            results = [hadith.matn for hadith in hadiths]
+
+            return {
+                "results": results,
+                "total_pages": total_pages,
+                "current_page": page,
+            }
+
+        except Exception as e:
+            print(f"Error searching Hadith by narrator '{narrator_name}' in project '{project_name}': {e}")
+            return {
+                "results": [],
+                "total_pages": 0,
+                "current_page": page,
+            }
+        finally:
+            if session:
+                session.close()

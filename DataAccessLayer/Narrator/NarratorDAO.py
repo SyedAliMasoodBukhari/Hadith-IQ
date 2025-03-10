@@ -143,3 +143,38 @@ class NarratorDAO(AbsNarratorDAO):
             }
         finally:
             session.close()
+    def getAllNarrators(self, page: int) -> dict:
+        try:
+            session: Session = self.__dbConnection.getSession()
+
+            per_page = 100
+            total_narrators = session.query(Narrator).count()
+            total_pages = (total_narrators + per_page - 1) // per_page  
+
+            if page > total_pages:
+                return {
+                    "results": [],
+                    "total_pages": total_pages,
+                    "current_page": page,
+                }
+
+            narrators = session.query(Narrator).offset((page - 1) * per_page).limit(per_page).all()
+            narrator_names = [ narrator.narratorname for narrator in narrators]
+
+            return {
+                "results": narrator_names,
+                "total_pages": total_pages,
+                "current_page": page,
+            }
+
+        except Exception as e:
+            session.rollback()
+            print(f"Error retrieving narrators: {e}")
+            return {
+                "results": [],
+                "total_pages": 0,
+                "current_page": page,
+            }
+        finally:
+            session.close()
+

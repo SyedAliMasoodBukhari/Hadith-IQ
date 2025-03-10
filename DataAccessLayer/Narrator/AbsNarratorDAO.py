@@ -33,4 +33,7 @@ class AbsNarratorDAO(ABC):
     @abstractmethod
     def getAllNarratorsOfProject(self, project_name: str,page :int) ->dict:
         pass
+    @abstractmethod
+    def getAllNarrators(self, page: int) -> dict:
+        pass
       

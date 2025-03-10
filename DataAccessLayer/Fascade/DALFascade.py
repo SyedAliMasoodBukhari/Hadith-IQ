@@ -87,6 +87,10 @@ class DALFascade(AbsDALFascade):
         return self.__hadithDAO.getAllHadithsOfProject(projectName,page)
     def getHadithDetails(self, matn: str) -> dict:
         return self.__hadithDAO.getHadithDetails(matn)
+    def getAllHadiths(self, page: int) -> dict:
+        return self.__hadithDAO.getAllHadiths(page)
+    def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
+        return self.__hadithDAO.searchHadithByNarrator(project_name,narrator_name,page)
     
     #AbsSanad Function
     
@@ -118,5 +122,7 @@ class DALFascade(AbsDALFascade):
         return self.__narratorDAO.getNarratorDetails(NarratorTO)
     def getAllNarratorsOfProject(self, project_name: str,page:int) -> dict:
         return self.__narratorDAO.getAllNarratorsOfProject(project_name,page)
+    def getAllNarrators(self, page: int) -> dict:
+        return self.__narratorDAO.getAllNarrators(page)
     
       

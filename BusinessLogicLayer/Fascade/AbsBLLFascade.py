@@ -64,7 +64,7 @@ class AbsBLLFascade(ABC):
       pass
     
    @abstractmethod
-   def getAllHadith(self)->List[HadithTO]:
+   def getAllHadiths(self, page: int) -> dict:
       pass
     
    @abstractmethod
@@ -132,6 +132,21 @@ class AbsBLLFascade(ABC):
       pass
    @abstractmethod
    def getAllNarratorsOfProject(self, project_name: str,page:int) -> dict:
+      pass
+   @abstractmethod
+   def convertHtmlToText(html_file: str) -> dict:
+      pass
+   @abstractmethod
+   def filter_and_append(self, input_file, arabic_count)->dict:
+      pass
+   @abstractmethod
+   def fetch_narrator_data(self,file_path:str,arabic_count:str)->dict:
+      pass
+   @abstractmethod
+   def getAllNarrators(self, page: int) -> dict:
+      pass
+   @abstractmethod
+   def searchHadithByNarrator(self, project_name: str, narrator_name: str, page: int) -> dict:
       pass
    
    #AbsSanadBO function
