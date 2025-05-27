@@ -70,10 +70,21 @@ flutter run -d chrome
 
 > Folowing are the screen shots of the Application
 ### 📚 Main Page
-![MainPage](Screenshots/hadith_iq(1).png)
+
+https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/e7d0720d8b4e0dac453c0035015b1b78c71c9d3b/Screenshots/hadith_iq%20(1).png
 
 ### 🔍 Search Hadiths
 
-![Search Screenshot](Screenshots/hadith_iq(11).png)
+
+### 👤 Narrator Details
+
+
+### 🔄 Import/Export Interface
+
+
+### 🧩 Project Management
+
+
+### 📈 Project State Managenment
 
 
