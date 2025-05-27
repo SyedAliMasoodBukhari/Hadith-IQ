@@ -70,8 +70,7 @@ flutter run -d chrome
 
 > Folowing are the screen shots of the Application
 ### 📚 Main Page
-
-https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/e7d0720d8b4e0dac453c0035015b1b78c71c9d3b/Screenshots/hadith_iq%20(1).png
+![Main Page Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/e7d0720d8b4e0dac453c0035015b1b78c71c9d3b/Screenshots/hadith_iq%20(1).png)
 
 ### 🔍 Search Hadiths
 
