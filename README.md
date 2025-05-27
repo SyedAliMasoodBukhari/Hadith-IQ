@@ -65,3 +65,15 @@ flutter upgrade
 flutter pub get
 flutter run -d chrome
 ```
+
+## 🖼️ Screenshots
+
+> Folowing are the screen shots of the Application
+### 📚 Main Page
+![MainPage](Screenshots/hadith_iq(1).png)
+
+### 🔍 Search Hadiths
+
+![Search Screenshot](Screenshots/hadith_iq(11).png)
+
+
