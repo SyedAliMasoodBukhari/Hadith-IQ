@@ -59,7 +59,7 @@ uvicorn BusinessLogicLayer.server:app --host 127.0.0.1 --port 8000 --reload
 ### 💻 Frontend Setup (React or Flutter Web/Desktop)
 
 ```bash
-cd hadith_iq
+cd hadith_iq/hadith_iq
 flutter clean
 flutter upgrade
 flutter pub get
