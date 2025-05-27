@@ -10,6 +10,8 @@ Hadith IQ is an intelligent platform designed for Islamic researchers and schola
 - 🧑‍🏫 **Narrator Sentiment Evaluation**
 - 🛡️ **Managing Project State** 
 - 📁 **Paginated Hadith Dataset Display**
+- 🔄 **Import & Export** of Hadith and Narrator data with structured formatting, cleaning, and preprocessing
+
 
 
 ## ⚙️ Tech Stack
@@ -35,6 +37,7 @@ git clone https://github.com/SyedAliMasoodBukhari/Hadith-IQ.git
 ### 🔧 Backend Setup (Python)
 
 > Add your config.properties with following details
+```bash
         [database]
         DB_URL = yoururl
         DB_PORT = yourport
@@ -44,6 +47,7 @@ git clone https://github.com/SyedAliMasoodBukhari/Hadith-IQ.git
         [API]
         API_KEY = yourAPIKey
         API_URL = yourAPIUrl
+```
 > Run your backend
 
 ```bash
