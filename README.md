@@ -51,12 +51,12 @@ git clone https://github.com/SyedAliMasoodBukhari/Hadith-IQ.git
 > Run your backend
 
 ```bash
-cd FYP/FYP
+# In the root directory
 uvicorn BusinessLogicLayer.server:app --host 127.0.0.1 --port 8000 --workers 4
 ```
 
 
-### 💻 Frontend Setup (React or Flutter Web/Desktop)
+### 💻 Frontend Setup (Flutter Web/Desktop)
 
 ```bash
 cd hadith_iq/hadith_iq
