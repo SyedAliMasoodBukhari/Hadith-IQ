@@ -52,7 +52,7 @@ git clone https://github.com/SyedAliMasoodBukhari/Hadith-IQ.git
 
 ```bash
 cd FYP/FYP
-uvicorn BusinessLogicLayer.server:app --host 127.0.0.1 --port 8000 --reload
+uvicorn BusinessLogicLayer.server:app --host 127.0.0.1 --port 8000 --workers 4
 ```
 
 
