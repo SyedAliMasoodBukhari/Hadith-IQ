@@ -72,6 +72,8 @@ flutter run -d chrome
 ### 📚 Main Page
 ![Main Page Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/e7d0720d8b4e0dac453c0035015b1b78c71c9d3b/Screenshots/hadith_iq%20(1).png)
 
+### 📊 Dashboard
+![Dashboard Page Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/d0a4b175ff193ef2c7bec8a1159f836f96ee0a60/Screenshots/Dashboard.jpeg)
 ### 🔍 Search Hadiths and Hadith Details Page
 
 ![Search Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(11).png)
