@@ -63,55 +63,62 @@ cd hadith_iq/hadith_iq
 flutter clean
 flutter upgrade
 flutter pub get
-flutter run -d chrome
+# Make sure desktop support is enabled and your platform dependencies are installed
+flutter run -d windows
 ```
 
 ## 🖼️ Screenshots
 
 > Folowing are the screen shots of the Application
 ### 📚 Main Page
-![Main Page Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/e7d0720d8b4e0dac453c0035015b1b78c71c9d3b/Screenshots/hadith_iq%20(1).png)
+![Main Page Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/e7d0720d8b4e0dac453c0035015b1b78c71c9d3b/Screenshots/hadith_iq%20(1).png)
 
 ### 📊 Dashboard
-![Dashboard Page Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/d0a4b175ff193ef2c7bec8a1159f836f96ee0a60/Screenshots/Dashboard.jpeg)
+![Dashboard Page Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/d0a4b175ff193ef2c7bec8a1159f836f96ee0a60/Screenshots/Dashboard.jpeg)
+
 ### 🔍 Search Hadiths and Hadith Details Page
 
-![Search Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(11).png)
+![Search Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(11).png)
 
-![Search Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(12).png)
+![Search Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(12).png)
 
-![Search Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(13).png)
+![Search Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(13).png)
 
-![Search Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(16).png)
+![Search Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(16).png)
+
+![Search Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a24a0365519289473ff028d42eefa01057f75f4c/Screenshots/HadithDetailsPage.png)
 
 
 ### 👤 Narrators and Narrator Details Page 
 
-![Narrators Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq(19).png)
+![Narrators Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq(19).png)
 
-![Narrators Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(18).png)
+![Narrators Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a24a0365519289473ff028d42eefa01057f75f4c/Screenshots/NarratorDetailsPage.png)
 
-![Narrators Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(3).png)
+![Narrators Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/ceb8c08599a2ed609208b2103e007a4a59a0ecd0/Screenshots/hadith_iq%20(18).png)
+
+![Narrators Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(3).png)
+
 
 
 ### 🔄 Import/Export Interface
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(7).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(7).png)
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(8).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(8).png)
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(9).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(9).png)
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(10).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(10).png)
 
 
 ### 🧩 Project Management
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(6).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(6).png)
 
 ### 📈 Project State Managenment
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(14).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(14).png)
 
-![IE Screeshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(15).png)
+![IE Screenshot](https://github.com/SyedAliMasoodBukhari/Hadith-IQ/blob/a02d576b603f94f5f244d61fe71fa06e6692c20b/Screenshots/hadith_iq%20(15).png)
 
