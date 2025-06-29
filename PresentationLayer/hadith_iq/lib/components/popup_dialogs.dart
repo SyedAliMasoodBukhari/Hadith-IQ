@@ -939,7 +939,7 @@ class PopupDialogs {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                '• Syed Ali Masood\n• Malaika Tariq',
+                                '• Malaika Tariq',
                                 style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
